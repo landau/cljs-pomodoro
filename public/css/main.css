@@ -200,19 +200,19 @@ body {
 }
 
 .gem {
-  width:10px;
-  height: 10px;
-  border-radius: 5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
   border: 1px solid #aab4b9;
   float: left;
-  background-color: #d6dadc;
+  background-color: #dedede;
   margin-right: 8px;
-  margin-top: 15px;
+  margin-top: 10px;
   cursor: pointer;
-  font-size: 14px;
-  line-height: 9px;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 20px;
   text-align: center;
-  color:	transparent;
 }
 
 .gem:hover {
@@ -221,7 +221,7 @@ body {
   border-color: #878b90;
 }
 
-.gem-red {
+.gem:first-child {
   margin-left: 15px;
 }
 

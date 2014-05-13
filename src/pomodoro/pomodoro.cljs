@@ -39,8 +39,7 @@
   [d]
   (let [min (.getMinutes d)
         sec (.getSeconds d)
-        formatted (map #(if (< % 10) (str "0" %) %)
-                       [min sec])]
+        formatted (map #(if (< % 10) (str "0" %) %) [min sec])]
     (string/join ":" formatted)))
 ; END format-time
 
@@ -50,16 +49,29 @@
 (defmethod display-time js/Date [d] (format-time d))
 ; END display-time
 
+(defn preset-view [{:keys [on] :as cursor} owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div #js {:className "gem"
+                    :onClick (fn []
+                               (when (not (.valueOf on))
+                                (let [t (om/get-state owner :time)]
+                                (om/transact! cursor #(assoc
+                                                       (into % (default-state))
+                                                       :etime (+ (* one-min t) (now)))))))}
+               (om/get-state owner :time)))))
+
 ; START timer-top
-(defn timer-top [app _]
+(defn timer-top [cursor _]
   (reify
     om/IRender
     (render [_]
       (dom/div #js {:className "timer-top"}
                (dom/div #js {:className "timer-gems"}
-                        (dom/div #js {:className "gem gem-red"} "")
-                        (dom/div #js {:className "gem gem-yellow"} "")
-                        (dom/div #js {:className "gem gem-green"} ""))
+                      (om/build preset-view cursor {:init-state {:time 1}})
+                      (om/build preset-view cursor {:init-state {:time 5}})
+                      (om/build preset-view cursor {:init-state {:time 25}}))
            (dom/div #js {:className "timer-title"} "pOModoro")))))
 ; END timer-top
 
@@ -120,14 +132,22 @@
 
 ; START timer-bottom
 ;; TODO implement current time
-(defn timer-bottom [cursor _]
+(defn timer-bottom [cursor owner]
   (reify
+    om/IInitState
+    (init-state [_] {:now (now)})
+
+    om/IWillMount
+    (will-mount [_]
+      (js/setInterval #(om/set-state! owner :now (now)) 1e3))
+
     om/IRender
     (render [_]
       (dom/div
         #js {:className "timer-bottom"}
         (dom/div #js {:className "timer-current-title"} "Current Time:")
-        (dom/div #js {:className "timer-current-time"} "00:00:00")))))
+        (dom/div #js {:className "timer-current-time"}
+                 (.format (js/moment) "h:mm:ss a" (om/get-state owner :now)))))))
 ; END timer-bottom
 
 ; START can-update
