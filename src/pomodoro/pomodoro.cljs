@@ -28,7 +28,7 @@
    :on false})
 
 ; START app-state
-;; TODO remove assoc
+;; FIXME remove assoc
 (def app-state (atom (assoc (default-state) :on true)))
 ; END app-state
 
@@ -36,7 +36,9 @@
 (defn format-time
   "Format time as min:sec"
   [d]
-  (str (.getMinutes d) ":" (.getSeconds d)))
+  (let [min (.getMinutes d)
+        sec (.getSeconds d)]
+    (str min ":" (if (< sec 10) (str "0" sec) sec))))
 ; END format-time
 
 ; START display-time multi method
@@ -46,31 +48,60 @@
 ; END display-time
 
 ; START timer-view
-(defn timer-view [{:keys [stime etime on]} _]
+(defn timer-view [{:keys [stime etime on] :as app} owner]
   (reify
     om/IDisplayName
     (display-name [_] "timer-view")
+
+    om/IInitState
+    (init-state [_]
+      {:btn-text (if on "Pause" "Resume")})
+
+    om/IDidUpdate
+    (did-update [_ {:keys [on]} _]
+      ;; FIXME Why isn't this updating?
+      (om/set-state! owner :btn-text (if on "Pause" "Resume")))
+
+    om/IRenderState
+    (render-state [_ state]
+      (dom/div
+        #js {:className "col-lg-6"}
+        (dom/h1 nil
+               (display-time (- etime stime)))
+
+        (dom/button #js {:className "btn btn-lg"
+                         :onClick #(om/transact! on (fn [v] (not v)))}
+                    (:btn-text state))))))
+; END timer-view
+
+; START control-btn
+(defn control-btn [{:keys [stime etime on] :as cursor}]
+  (reify
+    om/IDisplayName (display-name [_] "control-btn")
+
+    om/IRenderState
+    (render-state [_ state]
+      (dom/button
+        #js {:className "btn"
+             :onClick (fn [_]
+                        (when (not (.valueOf on))
+                          (om/transact! cursor #(assoc %
+                                                    :stime (now)
+                                                    :etime (+ (:time state) (now))))))}
+        (/ (:time state) 1e3 60)))))
+; END control-btn
+
+; START controls-view
+(defn controls-view [{:keys [stime etime on] :as cursor}]
+  (reify
+    om/IDisplayName (display-name [_] "controls-view")
 
     om/IRender
     (render [_]
       (dom/div
         #js {:className "col-lg-6"}
-        (dom/h1 nil
-               (display-time (- etime stime)))
-        (dom/button #js {:className "btn btn-lg"
-                         :onClick #(om/transact! on (fn [v] (not v)))}
-                    (if on "Pause" "Resume"))))))
-; END timer-view
-
-; START controls-view
-(defn controls-view [{:keys [stime etime on]}]
-  (reify
-    om/IDisplayName
-    (display-name [_] "controls-view")
-
-    om/IRender
-    (render [_]
-      (dom/div #js {:className "col-lg-6"} "hi"))))
+        (om/build control-btn cursor {:init-state {:time (:five presets)}})
+        (om/build control-btn cursor {:init-state {:time (:twenty-five presets)}})))))
 ; END controls-view
 
 

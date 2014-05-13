@@ -91,9 +91,19 @@ i {
   color: #3498db; 
 }
 
+.navbar-default {
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.navbar-default .navbar-brand {
+  color: white;
+  font-family: 'Lato', sans-serif;
+  font-weight: 300;
+}
 
 /* HeaderWrap */
-#headerwrap {
+#header {
   background-color: #e4262c;
   margin-top: -20px;
   padding-top:200px;
@@ -103,11 +113,19 @@ i {
   width: 100%;
 }
 
-#headerwrap h1 {
+#header h3 {
   margin-top: 60px;
+  color: #f2f2f2;
+}
+
+#header h1 {
   margin-bottom: 15px;
   color: white;
   font-size: 100px;
   font-weight: 300;
   letter-spacing: 1px;
+}
+
+.btn {
+  background-color: #f2f2f2;
 }
