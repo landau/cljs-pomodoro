@@ -55,17 +55,16 @@
 
     om/IInitState
     (init-state [_]
-      {:btn-text (if on "Pause" "Resume")})
+      {:btn-text (if (.valueOf on) "Pause" "Resume")})
 
-    om/IDidUpdate
-    (did-update [_ {:keys [on]} _]
-      ;; FIXME Why isn't this updating?
-      (om/set-state! owner :btn-text (if on "Pause" "Resume")))
+    om/IWillUpdate
+    (will-update [_ {:keys [on]} _]
+      (om/set-state! owner :btn-text (if (.valueOf on) "Pause" "Resume")))
 
     om/IRenderState
     (render-state [_ state]
       (dom/div
-        #js {:className "col-lg-6"}
+        #js {:className "row"}
         (dom/h1 nil
                (display-time (- etime stime)))
 
@@ -82,7 +81,7 @@
     om/IRenderState
     (render-state [_ state]
       (dom/button
-        #js {:className "btn"
+        #js {:className "btn btn-default"
              :onClick (fn [_]
                         (when (not (.valueOf on))
                           (om/transact! cursor #(assoc %
@@ -99,16 +98,91 @@
     om/IRender
     (render [_]
       (dom/div
-        #js {:className "col-lg-6"}
-        (om/build control-btn cursor {:init-state {:time (:five presets)}})
-        (om/build control-btn cursor {:init-state {:time (:twenty-five presets)}})))))
+        #js {:className "row"}
+        (dom/div #js {:className "btn-group"}
+                 (om/build control-btn cursor {:init-state {:time (:five presets)}})
+                 (om/build control-btn cursor {:init-state {:time (:twenty-five presets)}}))))))
 ; END controls-view
 
+; START timer-top
+(defn timer-top [app _]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div #js {:className "timer-top"}
+               (dom/div #js {:className "timer-gems"}
+                        (dom/div #js {:className "gem gem-red"} "")
+                        (dom/div #js {:className "gem gem-yellow"} "")
+                        (dom/div #js {:className "gem gem-green"} ""))
+           (dom/div #js {:className "timer-title"} "pOModoro")))))
+; END timer-top
+
+; START timer-controls
+(defn timer-controls [app _]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div
+        #js {:className "timer-controls"}
+        ;; play button
+        (dom/div #js {:className "play-control-outer control-outer"}
+                 (dom/div #js {:className "control-inner"}
+                          (dom/div #js {:className "control-icon control-icon-play"}
+                                   (dom/i #js {:className "icon-play"}))))
+
+        ;; Stop button
+        (dom/div #js {:className "stop-control-outer control-outer"}
+                 (dom/div #js {:className "control-inner"}
+                          (dom/div #js {:className "control-icon control-icon-stop"}
+                                   (dom/i #js {:className "icon-stop"}))))
+        ;; Reset button
+        (dom/div #js {:className "reset-control-outer control-outer"}
+                 (dom/div #js {:className "control-inner"}
+                          (dom/div #js {:className "control-icon"}
+                                   (dom/i #js {:className "icon-refresh"}))))))))
+; END timer-controls
+
+; START timer-view
+(defn timer-view [app _]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div
+        #js {:className "timer-numbers-block"}
+        (dom/div #js {:className "timer_numbers"} "00:00:00")
+        (dom/div #js {:className "timer_number_titles"}
+                 (dom/div #js {:className "timer_number_hour"} "hour")
+                 (dom/div #js {:className "timer_number_min"} "min")
+                 (dom/div #js {:className "timer_number_sec"} "sec"))))))
+; END timer-view
+
+; START timer-middle
+(defn timer-middle [app _]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div
+        #js {:className "timer-middle"}
+        (om/build timer-controls app)
+        (om/build timer-view app)))))
+; END timer-middle
+
+; START timer-bottom
+(defn timer-bottom [app _]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div
+        #js {:className "timer-bottom"}
+        (dom/div #js {:className "timer-current-title"} "Current Time:")
+        (dom/div #js {:className "timer-current-time"} "00:00:00")))))
+; END timer-bottom
 
 ; START can-update
 (defn can-update [{:keys [stime etime on]}]
-  (and on (> (- etime stime) 0)))
+  (and (.valueOf on) (> (- etime stime) 0)))
 ; END can-update
+
 
 ; START pom-view
 (defn pom-view [{:keys [stime on] :as app} owner]
@@ -128,9 +202,10 @@
     om/IRender
     (render [_]
       (dom/div
-        nil
-        (om/build timer-view app)
-        (om/build controls-view app)))))
+        #js {:className "timer-body"}
+        (om/build timer-top app)
+        (om/build timer-middle app)
+        (om/build timer-bottom app)))))
 ; END pom-view
 
 (om/root pom-view app-state

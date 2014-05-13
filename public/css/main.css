@@ -9,43 +9,10 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Titles */
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Lato', sans-serif;
-  font-weight: 300;
-  color: #333;
-}
-
-h1 {
-  font-size: 40px;
-}
-
-h3 {
-  color: #95a5a6;
-  font-weight: 400;
-}
-
-h4 {
-  color: #95a5a6;
-  font-weight: 400;
-  font-size: 20px;
-}
-
-/* Paragraph & Typographic */
-p {
-  line-height: 28px;
-  margin-bottom: 25px;
-  font-size: 16px;
-}
-
-.centered {
-  text-align: center;
-}
-
-/* Links */
 a {
   color: #3498db;
   word-wrap: break-word;
+  text-decoration: none;
 
   -webkit-transition: color 0.1s ease-in, background 0.1s ease-in;
   -moz-transition: color 0.1s ease-in, background 0.1s ease-in;
@@ -70,6 +37,34 @@ a:after {
   transition: color 0.1s ease-in, background 0.1s ease-in;
 }
 
+/*
+
+h1 {
+  font-size: 40px;
+}
+
+h3 {
+  color: #95a5a6;
+  font-weight: 400;
+}
+
+h4 {
+  color: #95a5a6;
+  font-weight: 400;
+  font-size: 20px;
+}
+
+p {
+  line-height: 28px;
+  margin-bottom: 25px;
+  font-size: 16px;
+}
+
+.centered {
+  text-align: center;
+}
+
+
 hr {
   display: block;
   height: 1px;
@@ -79,53 +74,250 @@ hr {
   padding: 0;
 }
 
-/* Helpers */
-
-.mt {
-  margin-top: 40px;
-  margin-bottom: 40px;
-}
 
 i {
   margin: 8px;
   color: #3498db; 
 }
 
-.navbar-default {
-  background-color: transparent;
-  border-color: transparent;
-}
-
-.navbar-default .navbar-brand {
-  color: white;
-  font-family: 'Lato', sans-serif;
-  font-weight: 300;
-}
-
-/* HeaderWrap */
-#header {
-  background-color: #e4262c;
-  margin-top: -20px;
-  padding-top:200px;
-  background-attachment: relative;
-  background-position: center center;
+#app {
+  padding-top:100px;
   min-height: 650px;
-  width: 100%;
 }
 
-#header h3 {
-  margin-top: 60px;
-  color: #f2f2f2;
-}
-
-#header h1 {
-  margin-bottom: 15px;
+#app h1 {
   color: white;
   font-size: 100px;
   font-weight: 300;
   letter-spacing: 1px;
 }
 
+.jumbotron {
+ background-color: #e4262c;
+}
+
 .btn {
   background-color: #f2f2f2;
 }
+*/
+
+#footer p{
+  font-size: 25px;
+}
+
+body {
+  padding-top: 50px;
+  font-family: "HelveticaNeue", Helvetica, Arial, sans-serif;
+  background-color: #c8d1d7;
+}
+
+.timer-background {
+  width: 364px;
+  height: 234px;
+  padding-left: 36px;
+  padding-top: 66px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.timer-body {
+  height: 170px;
+  width: 318px;
+  border: 1px solid #979797;
+  background-color: #ffffff;
+  box-shadow:0px 0px 20px #979797;
+  border-radius: 5px;
+}
+
+.timer-top {
+  height: 41px;
+  border-bottom: 1px solid #dedede;
+}
+
+.timer-middle {
+  height: 86px;
+  border-bottom: 1px solid #dedede;
+}
+
+.timer-bottom {
+  height: 45px;
+  height: 40px;
+  background-color: #eeeeee;
+  border-top: 1px solid #ffffff;
+  border-radius: 0px 0px 5px 5px;
+}
+
+.timer-gems {
+  width: 159px;
+  height: 41px;
+  float: left;
+}
+
+.timer-title {
+  width: 146px;
+  height: 29px;
+  float: left;
+  color: #7e97ab;
+  font-size: 14px;
+  font-weight: 600;
+  padding-top: 12px;
+  padding-right: 13px;
+  text-align: right;
+}
+
+.timer-controls {
+  width: 159px;
+  height: 86px;
+  float: left;
+}
+
+.timer-numbers-block {
+  width: 159px;
+  height: 86px;
+  float: left;
+}
+
+.timer-current-title {
+  width: 144px;
+  height: 27px;
+  float: left;
+  font-size: 13px;
+  padding-left: 15px;
+  padding-top: 13px;
+  color: #666;
+}
+
+.timer-current-time {
+  width: 144px;
+  height: 27px;
+  font-size: 13px;
+  float: left;
+  padding-top: 13px;
+  padding-right: 15px;
+  text-align: right;
+  color: #666;
+}
+
+.gem {
+  width:10px;
+  height: 10px;
+  border-radius: 5px;
+  border: 1px solid #aab4b9;
+  float: left;
+  background-color: #d6dadc;
+  margin-right: 8px;
+  margin-top: 15px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 9px;
+  text-align: center;
+  color:	transparent;
+}
+
+.gem:hover {
+  color: #495259;
+  background-color: #aab4b9;
+  border-color: #878b90;
+}
+
+.gem-red {
+
+  margin-left: 15px;
+}
+
+
+
+.control-outer {
+  height: 40px;
+  width: 40px;
+  background-color: #e6e6e6;
+  border-radius: 23px;
+  margin-top: 19px;
+  float: left;
+  box-shadow: inset 0px 1px 1px #d1d1d1, inset 0px -3px 3px #ffffff;
+  padding-left: 6px;
+  padding-top: 6px;
+  color: #3c4349;
+}
+
+.control-inner {
+  width: 33px;
+  height: 33px;
+  border-radius: 16.5px;
+  box-shadow: inset 0px 1px 2px #ffffff, inset 0px -1px 2px #aaaaaa;
+  background: #ffffff; /* Old browsers */
+  background: -moz-linear-gradient(top, #ffffff 0%, #e2e2e2 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#e2e2e2)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, #ffffff 0%,#e2e2e2 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, #ffffff 0%,#e2e2e2 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, #ffffff 0%,#e2e2e2 100%); /* IE10+ */
+  background: linear-gradient(to bottom, #ffffff 0%,#e2e2e2 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e2e2e2',GradientType=0 ); /* IE6-9 */
+}
+
+.control-icon {
+  padding-top: 8px;
+  font-size: 15px;
+  text-align: center;
+}
+
+.play-control-outer {
+  margin-left: 16px;
+  cursor: pointer;
+}
+
+.stop-control-outer {
+  margin-left: -7px;
+  cursor: pointer;
+}
+
+.reset-control-outer {
+  margin-left: -7px;
+  cursor: pointer;
+}
+
+.play-control-outer:hover {
+  color: #7e97ab;
+  text-shadow: inset 0px -1px 1px #333333;
+}
+
+.stop-control-outer:hover {
+  color: #cf6767;
+  text-shadow: inset 0px -1px 1px #333333;
+}
+
+.reset-control-outer:hover {
+  color: #91cf67;
+  text-shadow: inset 0px -1px 1px #333333;
+}
+
+.timer_numbers {
+  font-weight: 300;
+  font-size: 32px;
+  color: #666666;
+  margin-top: 20px;
+  margin-left: 20px;
+  font-family: "HelveticaNeue-Light", Helvetica, Arial, sans-serif;
+}
+
+.timer_number_titles {
+  color: #666666;
+  font-size: 9px;	
+  font-weight: 300;
+  text-transform: uppercase;
+}
+
+.timer_number_hour, .timer_number_min, .timer_number_sec {
+  float: left;
+  margin-left: 24px;
+}
+
+.timer_number_min {
+  margin-left: 27px;
+}
+
+.timer_number_sec {
+  margin-left: 34px;
+}
+
+
