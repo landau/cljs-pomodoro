@@ -54,6 +54,7 @@
     (render [_]
       (dom/div #js {:className "gem"
                     :onClick (fn []
+                               ;; Set to defaults + the components state :time
                                (when (not (.valueOf on))
                                 (let [t (om/get-state owner :time)]
                                 (om/transact! cursor #(assoc
@@ -167,10 +168,11 @@
           (om/transact! cursor #(if (can-update %)
                                (assoc % :stime (+ 1e3 (:stime %)))
                                %)))
-        10))
+        1e3))
 
     om/IWillUpdate
     (will-update [_ {:keys [etime stime]} _]
+      ;; If time is zero then set on to false
       (when (<= (- etime stime) 0)
         (om/transact! on #(identity false))))
 

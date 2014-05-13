@@ -148,7 +148,6 @@ body {
   border-radius: 0px 0px 5px 5px;
   background-color: #eee;
   font-weight: 300;
-  text-transform: uppercase;
 }
 
 .timer-gems {
@@ -187,6 +186,7 @@ body {
   font-size: 13px;
   padding-left: 15px;
   padding-top: 13px;
+  text-transform: capitalize;
 }
 
 .timer-current-time {
@@ -197,19 +197,22 @@ body {
   padding-top: 13px;
   padding-right: 15px;
   text-align: right;
+  text-transform: uppercase;
 }
 
 .gem {
-  width: 20px;
+  width: 23px;
   height: 20px;
-  border-radius: 50%;
+  border-radius: 0 0 3px 3px;
   border: 1px solid #aab4b9;
+  border-top: none;
+
   float: left;
   background-color: #dedede;
+  /*background-color: #e4262c; RED */
   margin-right: 8px;
-  margin-top: 10px;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 400;
   line-height: 20px;
   text-align: center;
