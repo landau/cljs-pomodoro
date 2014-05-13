@@ -8,9 +8,9 @@ pom.xml
 .lein-repl-history
 .lein-plugins/
 .nrepl-port
-pomodoro.js
-pomodoro/js/cljs/
-pomodoro/js/goog/
-pomodoro/js/om/
-pomodoro/js/pomodoro/
-pomodoro/js/clojure
+public/js/pomodoro.js
+public/js/dev/cljs/
+public/js/dev/goog/
+public/js/dev/om/
+public/js/dev/pomodoro/
+public/js/dev/clojure
