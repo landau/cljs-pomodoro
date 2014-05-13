@@ -29,8 +29,7 @@
    :on false})
 
 ; START app-state
-;; FIXME remove assoc
-(def app-state (atom (assoc (default-state) :on true)))
+(def app-state (atom (default-state)))
 ; END app-state
 
 ; START format-time
@@ -156,7 +155,7 @@
 ; END can-update
 
 ; START pom-view
-(defn pom-view [{:keys [stime on] :as app} owner]
+(defn pom-view [{:keys [stime etime on] :as cursor} owner]
   (reify
     om/IDisplayName
     (display-name [_] "pom-view")
@@ -165,18 +164,23 @@
     (will-mount [_]
       (js/setInterval
         (fn []
-          (om/transact! app #(if (can-update %)
+          (om/transact! cursor #(if (can-update %)
                                (assoc % :stime (+ 1e3 (:stime %)))
                                %)))
-        1e3))
+        10))
+
+    om/IWillUpdate
+    (will-update [_ {:keys [etime stime]} _]
+      (when (<= (- etime stime) 0)
+        (om/transact! on #(identity false))))
 
     om/IRender
     (render [_]
       (dom/div
         #js {:className "timer-body"}
-        (om/build timer-top app)
-        (om/build timer-middle app)
-        (om/build timer-bottom app)))))
+        (om/build timer-top cursor)
+        (om/build timer-middle cursor)
+        (om/build timer-bottom cursor)))))
 ; END pom-view
 
 (om/root pom-view app-state
