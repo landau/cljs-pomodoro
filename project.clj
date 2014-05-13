@@ -19,8 +19,8 @@
   :cljsbuild {:builds [{:id "dev"
                         :source-paths ["src"]
                         :compiler
-                        {:output-to "public/js/pomodoro.js"
-                         :output-dir "public/js"
+                        {:output-to "pomodoro/js/pomodoro.js"
+                         :output-dir "pomodoro/js"
                          :optimizations :none
                          :pretty-print true
                          :source-map true}}]})

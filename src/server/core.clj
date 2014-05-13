@@ -2,15 +2,14 @@
   (:require [compojure.route :as route]
             [compojure.core :as compojure]
             [ring.util.response :as response]
-            [ring.adapter.jetty :as jetty])
-  (:import [java.io File]))
+            [ring.adapter.jetty :as jetty]))
 
-(println (.getCanonicalPath (File. ".")))
+(def root (str (System/getProperty "user.dir") "/pomodoro"))
 
 (compojure/defroutes app
   (compojure/GET "/" request
-    (response/file-response "index.html"))
-  (route/files "/"))
+    (response/file-response "index.html" {:root root}))
+  (route/files "/pomodoro" {:root root}))
 
 (defn -main []
   (prn "View the example at http://localhost:3000/")
