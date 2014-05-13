@@ -107,8 +107,6 @@ i {
 
 body {
   padding-top: 50px;
-  font-family: "HelveticaNeue", Helvetica, Arial, sans-serif;
-  background-color: #c8d1d7;
 }
 
 .timer-background {
@@ -118,6 +116,7 @@ body {
   padding-top: 66px;
   margin-left: auto;
   margin-right: auto;
+
 }
 
 .timer-body {
@@ -132,6 +131,9 @@ body {
 .timer-top {
   height: 41px;
   border-bottom: 1px solid #dedede;
+  /*background-color: #e4262c; RED */
+  background-color: #fafafa;
+  color: #666;
 }
 
 .timer-middle {
@@ -142,9 +144,11 @@ body {
 .timer-bottom {
   height: 45px;
   height: 40px;
-  background-color: #eeeeee;
   border-top: 1px solid #ffffff;
   border-radius: 0px 0px 5px 5px;
+  background-color: #eee;
+  font-weight: 300;
+  text-transform: uppercase;
 }
 
 .timer-gems {
@@ -157,7 +161,6 @@ body {
   width: 146px;
   height: 29px;
   float: left;
-  color: #7e97ab;
   font-size: 14px;
   font-weight: 600;
   padding-top: 12px;
@@ -184,7 +187,6 @@ body {
   font-size: 13px;
   padding-left: 15px;
   padding-top: 13px;
-  color: #666;
 }
 
 .timer-current-time {
@@ -195,7 +197,6 @@ body {
   padding-top: 13px;
   padding-right: 15px;
   text-align: right;
-  color: #666;
 }
 
 .gem {
@@ -221,11 +222,8 @@ body {
 }
 
 .gem-red {
-
   margin-left: 15px;
 }
-
-
 
 .control-outer {
   height: 40px;
@@ -262,7 +260,7 @@ body {
 }
 
 .play-control-outer {
-  margin-left: 16px;
+  margin-left: 25px;
   cursor: pointer;
 }
 
@@ -276,12 +274,12 @@ body {
   cursor: pointer;
 }
 
-.play-control-outer:hover {
+.play-control-outer:hover, .play-control-outer-active {
   color: #7e97ab;
   text-shadow: inset 0px -1px 1px #333333;
 }
 
-.stop-control-outer:hover {
+.stop-control-outer:hover, .stop-control-outer-active {
   color: #cf6767;
   text-shadow: inset 0px -1px 1px #333333;
 }
@@ -294,10 +292,9 @@ body {
 .timer_numbers {
   font-weight: 300;
   font-size: 32px;
-  color: #666666;
+  color: #666;
   margin-top: 20px;
-  margin-left: 20px;
-  font-family: "HelveticaNeue-Light", Helvetica, Arial, sans-serif;
+  margin-left: 50px;
 }
 
 .timer_number_titles {
@@ -307,17 +304,13 @@ body {
   text-transform: uppercase;
 }
 
-.timer_number_hour, .timer_number_min, .timer_number_sec {
+.timer_number_min, .timer_number_sec {
   float: left;
-  margin-left: 24px;
-}
-
-.timer_number_min {
-  margin-left: 27px;
+  margin-left: 67px;
 }
 
 .timer_number_sec {
-  margin-left: 34px;
+  margin-left: 28px;
 }
 
 

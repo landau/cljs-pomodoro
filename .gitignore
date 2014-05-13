@@ -9,3 +9,8 @@ pom.xml
 .lein-plugins/
 .nrepl-port
 pomodoro.js
+public/js/cljs/
+public/js/goog/
+public/js/om/
+public/js/pomodoro/
+public/js/clojure
