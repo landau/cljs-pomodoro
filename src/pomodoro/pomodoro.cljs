@@ -64,7 +64,7 @@
 ; END timer-top
 
 ; START timer-controls
-(defn timer-controls [on _]
+(defn timer-controls [{:keys [on] :as cursor} _]
   (reify
     om/IRender
     (render [_]
@@ -85,7 +85,11 @@
                                    (dom/i #js {:className "icon-stop"}))))
         ;; Reset button
         (dom/div #js {:className "reset-control-outer control-outer"}
-                 (dom/div #js {:className "control-inner"}
+                 (dom/div #js {:className "control-inner"
+                               :onClick #(when (not (.valueOf on))
+                                           (om/transact!
+                                             cursor
+                                             (fn [c] (into c (default-state)))))}
                           (dom/div #js {:className "control-icon"}
                                    (dom/i #js {:className "icon-refresh"}))))))))
 ; END timer-controls
@@ -110,7 +114,7 @@
     (render [_]
       (dom/div
         #js {:className "timer-middle"}
-        (om/build timer-controls (:on cursor))
+        (om/build timer-controls cursor)
         (om/build timer-view cursor)))))
 ; END timer-middle
 
@@ -130,7 +134,6 @@
 (defn can-update [{:keys [stime etime on]}]
   (and (.valueOf on) (> (- etime stime) 0)))
 ; END can-update
-
 
 ; START pom-view
 (defn pom-view [{:keys [stime on] :as app} owner]
