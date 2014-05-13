@@ -72,7 +72,8 @@
                       (om/build preset-view cursor {:init-state {:time 1}})
                       (om/build preset-view cursor {:init-state {:time 5}})
                       (om/build preset-view cursor {:init-state {:time 25}}))
-           (dom/div #js {:className "timer-title"} "pOModoro")))))
+
+               (dom/div #js {:className "timer-title"} "pOModoro")))))
 ; END timer-top
 
 ; START timer-controls

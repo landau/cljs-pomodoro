@@ -16,11 +16,20 @@
 
   :source-paths ["src"]
 
-  :cljsbuild {:builds [{:id "dev"
+  :cljsbuild {
+              :builds [{:id "dev"
                         :source-paths ["src"]
-                        :compiler
-                        {:output-to "public/js/pomodoro.js"
-                         :output-dir "public/js/dev"
-                         :optimizations :none
-                         :pretty-print true
-                         :source-map true}}]})
+                        :compiler {:output-to "public/js/pomodoro.js"
+                                   :output-dir "public/js/dev"
+                                   :optimizations :none
+                                   :pretty-print true
+                                   :source-map true}}
+                       {:id "prod"
+                        :source-paths ["src"]
+                        :compiler {:output-to "public/js/main.js"
+                                   :optimizations :advanced
+                                   :pretty-print false
+                                   :preamble ["public/js/react-0.9.0.js"]
+                                   :externs ["public/js/react-0.9.0.js"
+                                             "public/js/moment.min.js"]
+                                   :source-map true}}]})
