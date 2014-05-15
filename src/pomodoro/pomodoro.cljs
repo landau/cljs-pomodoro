@@ -84,27 +84,28 @@
       (dom/div
         #js {:className "timer-controls"}
         ;; play button
-        (dom/div #js {:className "play-control-outer control-outer"}
-                 (dom/div #js {:className "control-inner"}
-                          (dom/div #js {:className "control-icon control-icon-play"
-                                        :onClick #(om/transact! on (fn [_] true))}
-                                   (dom/i #js {:className "icon-play"}))))
+        (dom/div
+          #js {:className "play-control-outer control-outer"}
+          (dom/div #js {:className "control-inner"
+                        :onClick #(om/transact! on (fn [_] true))}
+                   (dom/div #js {:className "control-icon control-icon-play"}
+                            (dom/i #js {:className "icon-play"}))))
 
         ;; Stop button
-        (dom/div #js {:className "stop-control-outer control-outer"}
-                 (dom/div #js {:className "control-inner"}
-                          (dom/div #js {:className "control-icon control-icon-stop"
-                                        :onClick #(om/transact! on (fn [_] false))}
-                                   (dom/i #js {:className "icon-stop"}))))
+        (dom/div
+          #js {:className "stop-control-outer control-outer"}
+          (dom/div #js {:className "control-inner"
+                        :onClick #(om/transact! on (fn [_] false))}
+                   (dom/div #js {:className "control-icon control-icon-stop"}
+                            (dom/i #js {:className "icon-stop"}))))
         ;; Reset button
-        (dom/div #js {:className "reset-control-outer control-outer"}
-                 (dom/div #js {:className "control-inner"
-                               :onClick #(when (not (.valueOf on))
-                                           (om/transact!
-                                             cursor
-                                             (fn [c] (into c (default-state)))))}
-                          (dom/div #js {:className "control-icon"}
-                                   (dom/i #js {:className "icon-refresh"}))))))))
+        (dom/div
+          #js {:className "reset-control-outer control-outer"}
+          (dom/div #js {:className "control-inner"
+                        :onClick #(when (not (.valueOf on))
+                                    (om/transact! cursor (fn [c] (default-state))))}
+                   (dom/div #js {:className "control-icon"}
+                            (dom/i #js {:className "icon-refresh"}))))))))
 ; END timer-controls
 
 ; START timer-view
@@ -132,7 +133,6 @@
 ; END timer-middle
 
 ; START timer-bottom
-;; TODO implement current time
 (defn timer-bottom [cursor owner]
   (reify
     om/IInitState
@@ -146,7 +146,6 @@
     (render [_]
       (dom/div
         #js {:className "timer-bottom"}
-        (dom/div #js {:className "timer-current-title"} "Current Time:")
         (dom/div #js {:className "timer-current-time"}
                  (.format (js/moment) "h:mm:ss a" (om/get-state owner :now)))))))
 ; END timer-bottom
@@ -186,5 +185,4 @@
         (om/build timer-bottom cursor)))))
 ; END pom-view
 
-(om/root pom-view app-state
-  {:target (. js/document (getElementById "app"))})
+(om/root pom-view app-state {:target (. js/document (getElementById "app"))})
