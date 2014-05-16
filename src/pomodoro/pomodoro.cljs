@@ -28,6 +28,15 @@
    :etime (+ (:twenty-five presets) (now))
    :on false})
 
+(defn play-sound []
+  (let [s (.createElement js/document "audio")]
+    (set! (.-src s) "/sounds/bell.mp3")
+    (.play s)
+    s))
+
+(defn expired? [stime etime]
+  (<= (- etime stime) 0))
+
 ; START app-state
 (def app-state (atom (default-state)))
 ; END app-state
@@ -146,6 +155,7 @@
     (render [_]
       (dom/div
         #js {:className "timer-bottom"}
+        (dom/div #js {:className "timer-current-title"} "Current Time:")
         (dom/div #js {:className "timer-current-time"}
                  (.format (js/moment) "h:mm:ss a" (om/get-state owner :now)))))))
 ; END timer-bottom
@@ -173,8 +183,9 @@
     om/IWillUpdate
     (will-update [_ {:keys [etime stime]} _]
       ;; If time is zero then set on to false
-      (when (<= (- etime stime) 0)
-        (om/transact! on #(identity false))))
+      (when (expired? stime etime)
+        (om/transact! on #(identity false))
+        (play-sound)))
 
     om/IRender
     (render [_]
