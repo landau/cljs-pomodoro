@@ -172,6 +172,7 @@
     om/IDisplayName
     (display-name [_] "pom-view")
 
+    ;; Update timer and app state here
     om/IWillMount
     (will-mount [_]
       (js/setInterval
