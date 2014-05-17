@@ -1,5 +1,9 @@
-(defproject pomodoro "0.1.0-SNAPSHOT"
-  :description "FIXME: write this!"
+(defproject pomodoro "0.0.1"
+  :license {:name "ISC"
+            :url "http://opensource.org/licenses/ISC"
+            :distribution :repo}
+
+  :description "Pomodoro implemented with Om"
   :url "https://github.com/landau/cljs-pomodoro"
 
   :dependencies [[org.clojure/clojure "1.6.0"]
