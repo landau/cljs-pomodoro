@@ -27,13 +27,16 @@
 (defn default-state []
   {:stime (now)
    :etime (+ (:twenty-five presets) (now))
+   :orig-time (now)
    :on false})
 
+(def sound (.createElement js/document "audio"))
+(set! (.-src sound) "/sounds/bell.mp3")
+
 (defn play-sound []
-  (let [s (.createElement js/document "audio")]
-    (set! (.-src s) "/sounds/bell.mp3")
-    (.play s)
-    s))
+  (.load sound)
+  (.play sound)
+  sound)
 
 (defn expired? [stime etime]
   (<= (- etime stime) 0))
@@ -58,113 +61,105 @@
 (defmethod display-time js/Date [d] (format-time d))
 ; END display-time
 
-(defn preset-view [{:keys [on] :as cursor} owner]
+(defn preset-item [{:keys [on] :as cursor} owner]
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "gem"
-                    :onClick (fn []
-                               ;; Set to defaults + the components state :time
+      (dom/li
+        #js {:className (if (.valueOf on) "preset disabled" "preset")}
+        (dom/a #js {:onClick (fn [e]
+                               (.preventDefault e)
                                (when (not (.valueOf on))
-                                (let [t (om/get-state owner :time)]
-                                (om/transact! cursor #(assoc
-                                                       (into % (default-state))
-                                                       :etime (+ (* one-min t) (now)))))))}
-               (om/get-state owner :time)))))
+                                 (let [t (om/get-state owner :time)]
+                                   (om/transact! cursor
+                                                 #(assoc (into % (default-state))
+                                                         :etime (+ (* one-min t) (now)))))))}
+               (om/get-state owner :time))))))
 
-; START timer-top
-(defn timer-top [cursor _]
+(defn presets-view [{:keys [stime etime on] :as cursor} _]
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "timer-top"}
-               (dom/div #js {:className "timer-gems"}
-                      (om/build preset-view cursor {:init-state {:time 1}})
-                      (om/build preset-view cursor {:init-state {:time 5}})
-                      (om/build preset-view cursor {:init-state {:time 25}}))
+      (dom/div #js {:className "collapse navbar-collapse"}
+               (dom/ul #js {:className "nav navbar-nav navbar-right"}
+                       (om/build preset-item cursor {:init-state {:time 1}})
+                       (om/build preset-item cursor {:init-state {:time 5}})
+                       (om/build preset-item cursor {:init-state {:time 25}}))))))
 
-               (dom/div #js {:className "timer-title"} "pOModoro")))))
-; END timer-top
-
-; START timer-controls
-(defn timer-controls [{:keys [on] :as cursor} _]
+(defn header-view [{:keys [stime etime on] :as cursor} _]
   (reify
     om/IRender
     (render [_]
-      (dom/div
-        #js {:className "timer-controls"}
-        ;; play button
-        (dom/div
-          #js {:className "play-control-outer control-outer"}
-          (dom/div #js {:className "control-inner"
-                        :onClick #(om/transact! on (fn [_] true))}
-                   (dom/div #js {:className "control-icon control-icon-play"}
-                            (dom/i #js {:className "icon-play"}))))
+      (dom/nav #js {:className "navbar navbar-default"}
+               (dom/div #js {:className "navbar-header"}
+                        (dom/img #js {:className "navbar-left navbar-text"
+                                      :src "/images/pom-sm.png"
+                                      :alt "pomodoro"})
+                        (dom/a #js {:className "navbar-brand"
+                                    :href="http://pomodoro.trevorlandau.net"} "pOModoro"))
+               (om/build presets-view cursor)))))
 
-        ;; Stop button
-        (dom/div
-          #js {:className "stop-control-outer control-outer"}
-          (dom/div #js {:className "control-inner"
-                        :onClick #(om/transact! on (fn [_] false))}
-                   (dom/div #js {:className "control-icon control-icon-stop"}
-                            (dom/i #js {:className "icon-stop"}))))
-        ;; Reset button
-        (dom/div
-          #js {:className "reset-control-outer control-outer"}
-          (dom/div #js {:className "control-inner"
-                        :onClick #(when (not (.valueOf on))
-                                    (om/transact! cursor (fn [c] (default-state))))}
-                   (dom/div #js {:className "control-icon"}
-                            (dom/i #js {:className "icon-refresh"}))))))))
-; END timer-controls
-
-; START timer-view
-(defn timer-view [{:keys [etime stime]} _]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/div
-        #js {:className "timer-numbers-block"}
-        (dom/div #js {:className "timer_numbers"} (display-time (- etime stime)))
-        (dom/div #js {:className "timer_number_titles"}
-                 (dom/div #js {:className "timer_number_min"} "min")
-                 (dom/div #js {:className "timer_number_sec"} "sec"))))))
-; END timer-view
-
-; START timer-middle
-(defn timer-middle [cursor _]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/div
-        #js {:className "timer-middle"}
-        (om/build timer-controls cursor)
-        (om/build timer-view cursor)))))
-; END timer-middle
-
-; START timer-bottom
-(defn timer-bottom [cursor owner]
+(defn timer-view [{:keys [stime etime on]} owner]
   (reify
     om/IInitState
-    (init-state [_] {:now (now)})
+    (init-state [_]
+      {:width "100%"})
 
-    om/IWillMount
-    (will-mount [_]
-      (js/setInterval #(om/set-state! owner :now (now)) 1e3))
+    om/IWillUpdate
+    (will-update [_ {:keys [stime etime orig-time]} _]
+      (om/set-state! owner :width (str (* (/ (- etime stime) (- etime orig-time))
+                                          100) "%")))
 
+    om/IRenderState
+    (render-state [_ {:keys [width]}]
+      (dom/div
+        #js {:className (let [s  "progress"]
+                          (if (.valueOf on)
+                            (str s " progress-striped active")
+                            s))}
+        (dom/div
+          #js {:className "progress-bar progress-bar-danger"
+               :style #js {:width width}}
+          (display-time (- etime stime)))))))
+
+(defn actions-view [{:keys [stime etime on] :as cursor} _]
+  (reify
     om/IRender
     (render [_]
       (dom/div
-        #js {:className "timer-bottom"}
-        (dom/div #js {:className "timer-current-title"} "Current Time:")
-        (dom/div #js {:className "timer-current-time"}
-                 (.format (js/moment) "h:mm:ss a" (om/get-state owner :now)))))))
-; END timer-bottom
+        nil
+        (dom/div #js {:className "center-block btn-group"}
+                 (dom/button
+                   #js {:type "button"
+                        :className "btn btn-sm btn-default"
+                        :onClick #(if (.valueOf on)
+                                    (om/transact! on (partial identity false))
+                                    (om/transact! on (partial identity true)))}
+                   (if (.valueOf on) "Pause" "Resume"))
 
-; START can-update
+                 (dom/button
+                   #js {:type "button"
+                        :className "btn btn-sm btn-default"
+                        :onClick #(when (not (.valueOf on))
+                                    (om/transact! cursor default-state))
+                        :disabled (when (.valueOf on) "disabled")}
+                   "Reset"))
+
+        (dom/div #js {:className "pull-right info-bar"}
+                 (dom/a #js {:href "https://github.com/landau/cljs-pomodoro"
+                             :target "_blank"}
+                        (dom/i #js {:className "fa fa-github-square"} ""))
+
+                 (dom/a #js {:href "https://twitter.com/trevor_landau"
+                             :target "_blank"}
+                        (dom/i #js {:className "fa fa-twitter-square"} ""))
+
+                 (dom/a #js {:href "http://en.wikipedia.org/wiki/Pomodoro_Technique"
+                             :target "_blank"}
+                        (dom/i #js {:className "fa fa-question-circle"} "")))))))
+
 (defn can-update [{:keys [stime etime on]}]
   (and (.valueOf on) (> (- etime stime) 0)))
-; END can-update
 
 ; START pom-view
 (defn pom-view [{:keys [stime etime on] :as cursor} owner]
@@ -193,9 +188,9 @@
     (render [_]
       (dom/div
         #js {:className "timer-body"}
-        (om/build timer-top cursor)
-        (om/build timer-middle cursor)
-        (om/build timer-bottom cursor)))))
+        (om/build header-view cursor)
+        (om/build timer-view cursor)
+        (om/build actions-view cursor)))))
 ; END pom-view
 
 (om/root pom-view app-state {:target (. js/document (getElementById "app"))})

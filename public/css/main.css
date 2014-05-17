@@ -1,18 +1,18 @@
 body {
-  background-color: #f2f2f2;
+  background: #fff;
   font-family: 'Lato', sans-serif;
   font-weight: 300;
   font-size: 16px;
   color: #555;
 
-  -webkit-font-smoothing: antialiased;
-  -webkit-overflow-scrolling: touch;
+  padding-top: 50px;
 }
 
 a {
   color: #3498db;
   word-wrap: break-word;
   text-decoration: none;
+  cursor: pointer;
 
   -webkit-transition: color 0.1s ease-in, background 0.1s ease-in;
   -moz-transition: color 0.1s ease-in, background 0.1s ease-in;
@@ -37,283 +37,72 @@ a:after {
   transition: color 0.1s ease-in, background 0.1s ease-in;
 }
 
-/*
-
-h1 {
-  font-size: 40px;
-}
-
-h3 {
-  color: #95a5a6;
-  font-weight: 400;
-}
-
-h4 {
-  color: #95a5a6;
-  font-weight: 400;
-  font-size: 20px;
-}
-
-p {
-  line-height: 28px;
-  margin-bottom: 25px;
-  font-size: 16px;
-}
-
-.centered {
-  text-align: center;
-}
-
-
-hr {
-  display: block;
-  height: 1px;
-  border: 0;
-  border-top: 1px solid #ccc;
-  margin: 1em 0;
-  padding: 0;
-}
-
-
-i {
-  margin: 8px;
-  color: #3498db; 
-}
-
-#app {
-  padding-top:100px;
-  min-height: 650px;
-}
-
-#app h1 {
-  color: white;
-  font-size: 100px;
-  font-weight: 300;
-  letter-spacing: 1px;
-}
-
-.jumbotron {
- background-color: #e4262c;
-}
-
-.btn {
-  background-color: #f2f2f2;
-}
-*/
-
 #footer p{
   font-size: 25px;
 }
 
-body {
-  padding-top: 50px;
-}
-
 #app {
-  width: 364px;
-  height: 234px;
-  padding-left: 36px;
-  padding-top: 66px;
-  margin-left: auto;
-  margin-right: auto;
-
+  background: #f7f7f7;
+  padding-bottom: 10px;
+  border-radius: 3px;
+  box-shadow: 0 0 20px #cfcfcf;
 }
 
-.timer-body {
-  height: 170px;
-  width: 318px;
-  border: 1px solid #979797;
-  background-color: #ffffff;
-  box-shadow:0px 0px 20px #979797;
-  border-radius: 5px;
+.navbar-header img {
+  display: inline-block;
+  height: 30px;
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 10px;
 }
 
-.timer-top {
-  height: 41px;
-  border-bottom: 1px solid #dedede;
-  /*background-color: #e4262c; RED */
-  background-color: #fafafa;
-  color: #666;
+.navbar {
+  background: transparent;
+  border: none;
+  margin-bottom: 0;
 }
 
-.timer-middle {
-  height: 86px;
-  border-bottom: 1px solid #dedede;
+.navbar {
+  background: transparent;
+  border: none;
+  margin-bottom: 0;
 }
 
-.timer-bottom {
-  height: 45px;
-  height: 40px;
-  border-top: 1px solid #ffffff;
-  border-radius: 0px 0px 5px 5px;
-  background-color: #eee;
-  font-weight: 300;
+.navbar-brand {
+  padding-left: 5px;
+  padding-right: 0;
 }
 
-.timer-gems {
-  width: 159px;
-  height: 41px;
-  float: left;
-}
-
-.timer-title {
-  width: 146px;
-  height: 29px;
-  float: left;
-  font-size: 14px;
-  font-weight: 600;
-  padding-top: 12px;
-  padding-right: 13px;
-  text-align: right;
-}
-
-.timer-controls {
-  width: 159px;
-  height: 86px;
-  float: left;
-}
-
-.timer-numbers-block {
-  width: 159px;
-  height: 86px;
-  float: left;
-}
-
-.timer-current-title {
-  width: 144px;
-  height: 27px;
-  float: left;
-  font-size: 13px;
-  padding-left: 15px;
-  padding-top: 13px;
-  text-transform: capitalize;
-}
-
-.timer-current-time {
-  width: 144px;
-  height: 27px;
-  font-size: 13px;
-  float: left;
-  padding-top: 13px;
-  padding-right: 15px;
-  text-align: right;
-  text-transform: uppercase;
-}
-
-.gem {
-  width: 23px;
-  height: 20px;
-  border-radius: 0 0 3px 3px;
-  border: 1px solid #aab4b9;
-  border-top: none;
-
-  float: left;
-  background-color: #dedede;
-  /*background-color: #e4262c; RED */
-  margin-right: 8px;
-  cursor: pointer;
-  font-size: 12px;
+.preset a:hover {
   font-weight: 400;
-  line-height: 20px;
-  text-align: center;
 }
 
-.gem:hover {
-  color: #495259;
-  background-color: #aab4b9;
-  border-color: #878b90;
+.progress {
+  height: 30px;
 }
 
-.gem:first-child {
-  margin-left: 15px;
+.progress-bar {
+  line-height: 29px;
+  font-size: 20px;
+  font-family: 'Lato';
 }
 
-.control-outer {
-  height: 40px;
-  width: 40px;
-  background-color: #e6e6e6;
-  border-radius: 23px;
-  margin-top: 19px;
-  float: left;
-  box-shadow: inset 0px 1px 1px #d1d1d1, inset 0px -3px 3px #ffffff;
-  padding-left: 6px;
-  padding-top: 6px;
-  color: #3c4349;
+.info-bar {
+  color: #777;
+  font-size: 22px;
 }
 
-.control-inner {
-  width: 33px;
-  height: 33px;
-  border-radius: 16.5px;
-  box-shadow: inset 0px 1px 2px #ffffff, inset 0px -1px 2px #aaaaaa;
-  background: #ffffff; /* Old browsers */
-  background: -moz-linear-gradient(top, #ffffff 0%, #e2e2e2 100%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#e2e2e2)); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top, #ffffff 0%,#e2e2e2 100%); /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(top, #ffffff 0%,#e2e2e2 100%); /* Opera 11.10+ */
-  background: -ms-linear-gradient(top, #ffffff 0%,#e2e2e2 100%); /* IE10+ */
-  background: linear-gradient(to bottom, #ffffff 0%,#e2e2e2 100%); /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e2e2e2',GradientType=0 ); /* IE6-9 */
+.info-bar a {
+  color: inherit;
+  display: inline-block;
+  margin-right: 10px;
 }
 
-.control-icon {
-  padding-top: 8px;
-  font-size: 15px;
-  text-align: center;
+.info-bar a:hover {
+  color: #444;
 }
 
-.play-control-outer {
-  margin-left: 25px;
-  cursor: pointer;
+.info-bar a:last-child {
+  margin: 0 ;
 }
-
-.stop-control-outer {
-  margin-left: -7px;
-  cursor: pointer;
-}
-
-.reset-control-outer {
-  margin-left: -7px;
-  cursor: pointer;
-}
-
-.play-control-outer:hover, .play-control-outer-active {
-  color: #7e97ab;
-  text-shadow: inset 0px -1px 1px #333333;
-}
-
-.stop-control-outer:hover, .stop-control-outer-active {
-  color: #cf6767;
-  text-shadow: inset 0px -1px 1px #333333;
-}
-
-.reset-control-outer:hover {
-  color: #91cf67;
-  text-shadow: inset 0px -1px 1px #333333;
-}
-
-.timer_numbers {
-  font-weight: 300;
-  font-size: 32px;
-  color: #666;
-  margin-top: 20px;
-  margin-left: 50px;
-}
-
-.timer_number_titles {
-  color: #666666;
-  font-size: 9px;	
-  font-weight: 300;
-  text-transform: uppercase;
-}
-
-.timer_number_min, .timer_number_sec {
-  float: left;
-  margin-left: 67px;
-}
-
-.timer_number_sec {
-  margin-left: 28px;
-}
-
 
