@@ -8,7 +8,6 @@
 
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2202"]
-                 [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
                  [om "0.6.2"]]
 
   :profiles {:dev {:dependencies [[ring/ring-jetty-adapter "1.1.1"]
@@ -33,8 +32,8 @@
                         :compiler {:output-to "public/js/main.js"
                                    :optimizations :advanced
                                    :pretty-print false
-                                   :preamble ["public/js/react-0.9.0.js"
-                                              "public/js/moment.min.js"]
+                                   ;;:preamble ["public/js/react-0.9.0.min.js"
+                                   ;;           "public/js/moment.min.js"]
                                    :externs ["public/js/react-0.9.0.js"
                                              "public/js/moment.min.js"]
                                    }}]})
