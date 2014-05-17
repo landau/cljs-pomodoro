@@ -80,7 +80,7 @@
   (reify
     om/IRender
     (render [_]
-      (dom/div #js {:className "collapse navbar-collapse"}
+      (dom/div #js {:className "navbar-collapse"}
                (dom/ul #js {:className "nav navbar-nav navbar-right"}
                        (om/build preset-item cursor {:init-state {:time 1}})
                        (om/build preset-item cursor {:init-state {:time 5}})
