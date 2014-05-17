@@ -33,7 +33,6 @@
                         :compiler {:output-to "public/js/main.js"
                                    :optimizations :advanced
                                    :pretty-print false
-                                   :preamble ["public/js/react-0.9.0.js"]
                                    :externs ["public/js/react-0.9.0.js"
                                              "public/js/moment.min.js"]
-                                   :source-map true}}]})
+                                   }}]})
