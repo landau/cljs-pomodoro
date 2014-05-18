@@ -32,6 +32,7 @@
 
 (def sound (.createElement js/document "audio"))
 (set! (.-src sound) "/sounds/bell.mp3")
+(.load sound)
 
 (defn play-sound []
   (.load sound)
