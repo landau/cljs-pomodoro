@@ -25,10 +25,11 @@
 (defn now [] (.now js/Date))
 
 (defn default-state []
-  {:stime (now)
-   :etime (+ (:twenty-five presets) (now))
-   :orig-time (now)
-   :on false})
+  (let [now (now)]
+    {:stime now
+     :etime (+ (:twenty-five presets) now)
+     :orig-time now
+     :on false}))
 
 (def sound (.createElement js/document "audio"))
 (set! (.-src sound) "/sounds/bell.mp3")
@@ -70,11 +71,12 @@
         #js {:className (if (.valueOf on) "preset disabled" "preset")}
         (dom/a #js {:onClick (fn [e]
                                (.preventDefault e)
-                               (when (not (.valueOf on))
-                                 (let [t (om/get-state owner :time)]
+                               (when-not (.valueOf on)
+                                 (let [t (om/get-state owner :time)
+                                       ds (default-state)]
                                    (om/transact! cursor
-                                                 #(assoc (into % (default-state))
-                                                         :etime (+ (* one-min t) (now)))))))}
+                                                 #(assoc (into % ds)
+                                                         :etime (+ (* one-min t) (:stime ds)))))))}
                (om/get-state owner :time))))))
 
 (defn presets-view [{:keys [stime etime on] :as cursor} _]
@@ -108,8 +110,9 @@
 
     om/IWillUpdate
     (will-update [_ {:keys [stime etime orig-time]} _]
-      (om/set-state! owner :width (str (* (/ (- etime stime) (- etime orig-time))
-                                          100) "%")))
+      (om/set-state! owner :width (-> (/ (- etime stime) (- etime orig-time))
+                                      (* 100)
+                                      (str "%"))))
 
     om/IRenderState
     (render-state [_ {:keys [width]}]
@@ -133,17 +136,16 @@
                  (dom/button
                    #js {:type "button"
                         :className "btn btn-sm btn-default"
-                        :onClick #(if (.valueOf on)
-                                    (om/transact! on (partial identity false))
-                                    (om/transact! on (partial identity true)))}
+                        :onClick (fn []
+                                   (om/transact! on #(not (.valueOf on))))}
                    (if (.valueOf on) "Pause" "Resume"))
 
                  (dom/button
                    #js {:type "button"
                         :className "btn btn-sm btn-default"
-                        :onClick #(when (not (.valueOf on))
+                        :onClick #(when-not (.valueOf on)
                                     (om/transact! cursor default-state))
-                        :disabled (when (.valueOf on) "disabled")}
+                        :disabled (.valueOf on)}
                    "Reset"))
 
         (dom/div #js {:className "pull-right info-bar"}
