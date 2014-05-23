@@ -24,12 +24,18 @@
 
 (defn now [] (.now js/Date))
 
-(defn default-state []
-  (let [now (now)]
-    {:stime now
-     :etime (+ (:twenty-five presets) now)
-     :orig-time now
-     :on false}))
+(defn default-state
+  ([]
+   (default-state (:twenty-five presets)))
+
+  ([selected]
+   (let [now (now)
+         s (get presets selected (:twenty-five presets))]
+     {:stime now
+      :etime (+ s now)
+      :orig-time now
+      :selected-time s
+      :on false})))
 
 (def sound (.createElement js/document "audio"))
 (set! (.-src sound) "/sounds/bell.mp3")
@@ -76,6 +82,7 @@
                                        ds (default-state)]
                                    (om/transact! cursor
                                                  #(assoc (into % ds)
+                                                         :selected-time t
                                                          :etime (+ (* one-min t) (:stime ds)))))))}
                (om/get-state owner :time))))))
 
@@ -185,6 +192,13 @@
       ;; If time is zero then set on to false
       (when (expired? stime etime)
         (om/transact! on #(identity false))
+
+        ;; This will cycle between 5/25 - TODO add option for cyclying
+        (om/transact! cursor
+                      #(let [selected (if (= (:selected-time %) (:twenty-five presets))
+                                        :five :twenty-five)]
+                         (default-state selected)))
+
         (play-sound)))
 
     om/IRender
