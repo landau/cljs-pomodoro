@@ -1,4 +1,4 @@
-(defproject pomodoro "0.0.3"
+(defproject pomodoro "0.0.4"
   :license {:name "ISC"
             :url "http://opensource.org/licenses/ISC"
             :distribution :repo}

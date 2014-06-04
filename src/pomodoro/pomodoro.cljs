@@ -37,14 +37,9 @@
       :selected-time s
       :on false})))
 
-(def sound (.createElement js/document "audio"))
-(set! (.-src sound) "/sounds/bell.mp3")
-(.load sound)
-
-(defn play-sound []
-  (.load sound)
-  (.play sound)
-  sound)
+(def ^:constant sound-src "/sounds/bell.mp3")
+(def sound (js/Audio. sound-src))
+(defn play-sound [] (do (set! (.-src sound) sound-src) (.play sound)))
 
 (defn expired? [stime etime]
   (<= (- etime stime) 0))
@@ -184,22 +179,19 @@
         (fn []
           (om/transact! cursor #(if (can-update %)
                                (assoc % :stime (+ 1e3 (:stime %)))
-                               %)))
+                               %))
+
+          ;; Must run sound outside of requestAnimationFrame cycle, all for the sound to play
+          (when (and (complement om/rendering?)
+                     (expired? (@cursor :stime) (@cursor :etime)))
+
+            (om/transact! cursor
+                          #(let [selected (if (= (:selected-time %) (:twenty-five presets))
+                                            :five :twenty-five)]
+                             (default-state selected)))
+            (om/transact! on #(identity false))
+            (play-sound)))
         1e3))
-
-    om/IWillUpdate
-    (will-update [_ {:keys [etime stime]} _]
-      ;; If time is zero then set on to false
-      (when (expired? stime etime)
-        (om/transact! on #(identity false))
-
-        ;; This will cycle between 5/25 - TODO add option for cyclying
-        (om/transact! cursor
-                      #(let [selected (if (= (:selected-time %) (:twenty-five presets))
-                                        :five :twenty-five)]
-                         (default-state selected)))
-
-        (play-sound)))
 
     om/IRender
     (render [_]

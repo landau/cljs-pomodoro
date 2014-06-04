@@ -20,6 +20,9 @@ Just make a pr. :)
 
 ## Changelog
 
+#### 0.0.4
+- Move playing sound outside requestAnimationFrame so tab doesn't have to be active
+
 #### 0.0.3
 - Automatically cycle between 25/5 sessions
 
