@@ -1,10 +1,27 @@
 (ns pomodoro.pomodoro
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            [weasel.repl :as ws-repl]))
 
 
 (enable-console-print!)
+
+(comment
+  ;; 1. start a repl using `lein repl`
+  ;; 2. from emacs, cider connect to the repl
+  ;; 3. execute these in the repl
+  (require '[cemerick.piggieback])
+  (cemerick.piggieback/cljs-repl
+   :repl-env (weasel.repl.websocket/repl-env
+              :ip "0.0.0.0" :port 3003))
+
+  ;; Open http://localhost:3000 in a browser
+
+  (in-ns 'pomodoro.pomodoro)
+  (ws-repl/connect "ws://localhost:3003" :verbose true))
+
+(ws-repl/connect "ws://localhost:3003" :verbose true)
 
 ; START time intervals
 (def ^:constant one-min (* 1e3 60))

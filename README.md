@@ -10,6 +10,8 @@ Start the server `lein run`
 
 Build the app `lein cljsbuild auto dev`
 
+Look at pomodoro.cljs and follow steps to start a browser-repl using weasel
+
 ## Tests
 
 Well...they are missing :(
