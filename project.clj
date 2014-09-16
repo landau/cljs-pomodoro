@@ -7,12 +7,18 @@
   :url "https://github.com/landau/cljs-pomodoro"
 
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2202"]
-                 [om "0.6.2"]]
+                 [org.clojure/clojurescript "0.0-2322"]
+                 [om "0.7.3"]
+                 [org.clojure/tools.nrepl "0.2.5"]
+                 [com.cemerick/piggieback "0.1.3"]
+                 [weasel "0.4.0-SNAPSHOT"]]
 
-  :profiles {:dev {:dependencies [[ring/ring-jetty-adapter "1.1.1"]
-                                  [compojure "1.1.0"]]}}
+  :profiles {:dev {:dependencies [[ring/ring-jetty-adapter "1.3.1"]
+                                  [compojure "1.1.0"]
+                                  [com.cemerick/piggieback "0.1.3"]]}}
 
+  :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
+  
   :main server.core
 
   :plugins [[lein-cljsbuild "1.0.3"]]
