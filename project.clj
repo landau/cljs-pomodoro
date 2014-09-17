@@ -10,14 +10,26 @@
                  [org.clojure/clojurescript "0.0-2322"]
                  [reagent "0.4.2"]]
 
-  :profiles {:dev {:dependencies [[ring/ring-jetty-adapter "1.1.1"]
-                                  [compojure "1.1.0"]]}}
+  :plugins [[lein-ring "0.8.11"]
+            [lein-cljsbuild "1.0.3"]
+            [lein-environ "0.5.0"]]
 
-  :main server.core
+  :ring {:handler server.core/app}
 
-  :plugins [[lein-cljsbuild "1.0.3"]]
+  :profiles {:uberjar {:aot :all}
+             :dev {:dependencies [[ring-mock "0.1.5"]
+                                  [ring/ring-devel "1.3.0"]
+                                  [compojure "1.1.9"]]
+                   :env {:dev true}}
 
-  :source-paths ["src"]
+             :release {:ring {:open-browser? false
+                              :stacktraces?  false
+                              :auto-reload?  false}}}
+
+
+  :source-paths ["src", "src-cljs"]
+
+  :main "core"
 
   :cljsbuild {
               :builds [{:id "dev"

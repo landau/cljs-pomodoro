@@ -1,111 +1,37 @@
-body {
-  background: #fff;
-  font-family: 'Lato', sans-serif;
-  font-weight: 300;
-  font-size: 16px;
-  color: #555;
-
-  padding-top: 50px;
+html,body {
+  height:100%;
 }
 
-a {
-  color: #3498db;
-  word-wrap: break-word;
-  text-decoration: none;
-  cursor: pointer;
-
-  -webkit-transition: color 0.1s ease-in, background 0.1s ease-in;
-  -moz-transition: color 0.1s ease-in, background 0.1s ease-in;
-  -ms-transition: color 0.1s ease-in, background 0.1s ease-in;
-  -o-transition: color 0.1s ease-in, background 0.1s ease-in;
-  transition: color 0.1s ease-in, background 0.1s ease-in;
+h1 {
+  font-family: Arial,sans-serif
+  font-size:80px;
+  color:#DDCCEE;
 }
 
-a:hover,
-a:focus {
-  color: #7b7b7b;
-  text-decoration: none;
-  outline: 0;
+.lead {
+  color:#DDCCEE;
 }
 
-a:before,
-a:after {
-  -webkit-transition: color 0.1s ease-in, background 0.1s ease-in;
-  -moz-transition: color 0.1s ease-in, background 0.1s ease-in;
-  -ms-transition: color 0.1s ease-in, background 0.1s ease-in;
-  -o-transition: color 0.1s ease-in, background 0.1s ease-in;
-  transition: color 0.1s ease-in, background 0.1s ease-in;
+/* Custom container */
+.container-full {
+  margin: 0 auto;
+  width: 100%;
+  min-height:100%;
+  background-color:#110022;
+  color:#eee;
+  overflow:hidden;
 }
 
-#footer p{
-  font-size: 25px;
+.container-full a {
+  color:#efefef;
+  text-decoration:none;
 }
 
-#app {
-  background: #f7f7f7;
-  padding-bottom: 10px;
-  border-radius: 3px;
-  box-shadow: 0 0 20px #cfcfcf;
+.v-center {
+  margin-top:7%;
 }
 
-.navbar-header img {
-  display: inline-block;
-  height: 30px;
-  margin-left: 0;
-  margin-right: 0;
-  margin-top: 10px;
-}
-
-.navbar {
-  background: transparent;
-  border: none;
-  margin-bottom: 0;
-}
-
-.navbar {
-  background: transparent;
-  border: none;
-  margin-bottom: 0;
-}
-
-.navbar-brand {
-  padding-left: 5px;
-  padding-right: 0;
-}
-
-.preset a:hover {
-  font-weight: 400;
-}
-
-.progress {
-  height: 30px;
-}
-
-.progress-bar {
-  line-height: 29px;
-  font-size: 20px;
-  font-family: 'Lato';
-}
-
-.info-bar {
-  color: #777;
-  font-size: 22px;
-}
-
-.info-bar a {
-  color: inherit;
-  display: inline-block;
-  margin-right: 10px;
-}
-
-.info-bar a:hover {
-  color: #444;
-}
-
-.info-bar a:last-child {
-  margin: 0 ;
-}
-
+/* signature */
 .sig {
   padding: 20px 0;
   text-align: center;
