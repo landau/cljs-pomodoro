@@ -7,8 +7,8 @@
   :url "https://github.com/landau/cljs-pomodoro"
 
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2202"]
-                 [om "0.6.2"]]
+                 [org.clojure/clojurescript "0.0-2322"]
+                 [reagent "0.4.2"]]
 
   :profiles {:dev {:dependencies [[ring/ring-jetty-adapter "1.1.1"]
                                   [compojure "1.1.0"]]}}
@@ -34,6 +34,6 @@
                                    :pretty-print false
                                    ;;:preamble ["public/js/react-0.9.0.min.js"
                                    ;;           "public/js/moment.min.js"]
-                                   :externs ["public/js/react-0.9.0.js"
+                                   :externs ["public/js/react-0.11.2.js"
                                              "public/js/moment.min.js"]
                                    }}]})
