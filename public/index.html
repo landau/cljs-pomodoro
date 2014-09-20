@@ -30,26 +30,34 @@
     <!--  <a href="https://github.com/landau/cljs-pomodoro"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>-->
 
 
-    <div class="container-full">
-      <div class="row">
-        <div class="col-lg-12 text-center v-center">
-          <h1>Hello Landing</h1>
-          <p class="lead">A sign-up page example for Bootstrap 3</p>
-          <br><br><br>
-          <form class="col-lg-12">
-            <div class="input-group" style="width:340px;text-align:center;margin:0 auto;">
-              <input class="form-control input-lg" title="Don't worry. We hate spam, and will not share your email with anyone." placeholder="Enter your email address" type="text">
-              <span class="input-group-btn"><button class="btn btn-lg btn-primary" type="button">OK</button></span>
-            </div>
-          </form>
+    <div class="container-full" id="app">
+
+      <div class="row v-center" id="timer">
+        <div class="col-md-3 col-md-offset-4">
+          <h1>8:46</h1>
+        </div>
+        <div class="col-md-2 buttons">
+          <button type="button" class="btn btn-lg"><i class="fa fa-play"></i></button>
+          <br/>
+          <button type="button" class="btn btn-lg"><i class="fa fa-refresh"></i></button>
         </div>
       </div> <!-- /row -->
+
       <div class="row">
-        <div class="col-lg-12 text-center v-center" style="font-size:39pt;">
-          <a href="#"><i class="icon-google-plus"></i></a> <a href="#"><i class="icon-facebook"></i></a>  <a href="#"><i class="icon-twitter"></i></a> <a href="#"><i class="icon-github"></i></a> <a href="#"><i class="icon-pinterest"></i></a>
+        <div class="col-lg-12 text-center">
+          <h2>Saturday, September 20</h2>
         </div>
-      </div>
-      <br><br><br><br><br>
+      </div> <!-- /row -->
+
+      <div class="row">
+        <div class="col-lg-12 text-center">
+          <div class="btn-group">
+            <a class="btn"><i class="fa fa-twitter"></i></a>
+            <a class="btn"><i class="fa fa-github"></i></a>
+            <a class="btn"><i class="fa fa-question-circle"></i></a>
+          </div>
+        </div>
+      </div> <!-- /row -->
     </div> <!-- /container full -->
 
     <!--
@@ -70,7 +78,7 @@
     </div>
     -->
 
-    <script src="/js/moment.min.js"></script>
+    <!-- <script src="/js/moment.min.js"></script>
     <script src="/js/react-0.11.2.js"></script>
     <script src="/js/dev/goog/base.js"></script>
     <script src="/js/pomodoro.js"></script>
@@ -84,6 +92,6 @@
       ga('create', 'UA-36148349-9', 'trevorlandau.net');
       ga('send', 'pageview');
 
-    </script>
+    </script> -->
   </body>
 </html>

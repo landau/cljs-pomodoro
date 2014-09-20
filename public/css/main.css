@@ -1,15 +1,24 @@
-html,body {
+html, body {
   height:100%;
+  font-family: 'Lato', sans-serif;
+  color: #fefefe;
+  font-weight: 300;
+  background: url(/images/bg2.jpg) center center no-repeat;
+  background-size: cover;
 }
 
 h1 {
-  font-family: Arial,sans-serif
-  font-size:80px;
-  color:#DDCCEE;
+  font-size:100px;
+  text-align: right;
 }
 
-.lead {
-  color:#DDCCEE;
+h2 {
+  font-size:50px;
+}
+
+h1, h2 {
+  font-weight: 300;
+  margin: 0;
 }
 
 /* Custom container */
@@ -17,8 +26,6 @@ h1 {
   margin: 0 auto;
   width: 100%;
   min-height:100%;
-  background-color:#110022;
-  color:#eee;
   overflow:hidden;
 }
 
@@ -28,7 +35,7 @@ h1 {
 }
 
 .v-center {
-  margin-top:7%;
+  margin-top: 7%;
 }
 
 /* signature */
@@ -36,4 +43,24 @@ h1 {
   padding: 20px 0;
   text-align: center;
   font-size: 14px;
+}
+
+.btn-toolbar{
+}​
+
+.btn, .buttons .btn {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none;
+  font-weight: 300;
+}
+
+.btn .fa {
+  font-size: 23px;
+}
+
+
+.buttons {
+  text-align: left;
+  margin-top: 20px;
 }

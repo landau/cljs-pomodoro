@@ -8,6 +8,7 @@
 
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2322"]
+                 [org.clojure/core.async "0.1.338.0-5c5012-alpha"]
                  [reagent "0.4.2"]]
 
   :plugins [[lein-ring "0.8.11"]
@@ -37,7 +38,7 @@
                         :compiler {:output-to "public/js/pomodoro.js"
                                    :output-dir "public/js/dev"
                                    :optimizations :none
-                                   :pretty-print true
+                                   :pretty-print tru
                                    :source-map true}}
                        {:id "prod"
                         :source-paths ["src"]
