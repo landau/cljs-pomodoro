@@ -3,7 +3,7 @@
             :url "http://opensource.org/licenses/ISC"
             :distribution :repo}
 
-  :description "Pomodoro implemented with Om"
+  :description "A simple pomodoro timer"
   :url "https://github.com/landau/cljs-pomodoro"
 
   :dependencies [[org.clojure/clojure "1.6.0"]
@@ -27,21 +27,20 @@
                               :stacktraces?  false
                               :auto-reload?  false}}}
 
+  :source-paths ["src"]
 
-  :source-paths ["src", "src-cljs"]
-
-  :main "core"
+  :main server.core
 
   :cljsbuild {
               :builds [{:id "dev"
-                        :source-paths ["src"]
+                        :source-paths ["src-cljs"]
                         :compiler {:output-to "public/js/pomodoro.js"
                                    :output-dir "public/js/dev"
                                    :optimizations :none
                                    :pretty-print tru
                                    :source-map true}}
                        {:id "prod"
-                        :source-paths ["src"]
+                        :source-paths ["src-cljs"]
                         :compiler {:output-to "public/js/main.js"
                                    :optimizations :advanced
                                    :pretty-print false

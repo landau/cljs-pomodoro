@@ -55,12 +55,19 @@ h1, h2 {
   font-weight: 300;
 }
 
-.btn .fa {
+.btn .fa, .buttons .btn {
   font-size: 23px;
 }
-
 
 .buttons {
   text-align: left;
   margin-top: 20px;
+}
+
+.btn:hover {
+  color: #3498db;
+}
+
+.buttons .btn:hover {
+  color: #999;
 }

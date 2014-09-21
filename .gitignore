@@ -16,3 +16,4 @@ public/js/dev/pomodoro/
 public/js/dev/clojure
 public/js/main.js
 .lein-env
+public/js/dev

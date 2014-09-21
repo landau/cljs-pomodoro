@@ -1,19 +1,23 @@
-(ns pomodoro.pomodoro
-  (:require [om.core :as om :include-macros true]
-            [om.dom :as dom :include-macros true]
+(ns main.pomodoro
+  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require [reagent.core :as reagent :refer [atom]]
+            [cljs.core.async :refer [put! <! chan]]
             [clojure.string :as string]))
 
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Debugging
 (enable-console-print!)
 
-; START time intervals
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Constants
+
 (def ^:constant one-min (* 1e3 60))
 (def ^:constant presets {:five (* one-min 5)
                          :twenty-five (* one-min 25)})
-; END time intervals
 
-;; Must extend number for js/Number since time
-;; is represented as milliseconds
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Compatability
+;; Must extend number for js/Number since time is represented as milliseconds
 (extend-type number
   ICloneable
   (-clone [n] (js/Number. n)))
@@ -22,33 +26,14 @@
   ICloneable
   (-clone [b] (js/Boolean. b)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Date conviences
 (defn now [] (.now js/Date))
+(defn ->date
+  "Creates a date object"
+  ([] (->date (now)))
+  ([t] (js/Date. t)))
 
-(defn default-state
-  ([]
-   (default-state (:twenty-five presets)))
-
-  ([selected]
-   (let [now (now)
-         s (get presets selected (:twenty-five presets))]
-     {:stime now
-      :etime (+ s now)
-      :orig-time now
-      :selected-time s
-      :on false})))
-
-(def ^:constant sound-src "/sounds/bell.mp3")
-(def sound (js/Audio. sound-src))
-(defn play-sound [] (do (set! (.-src sound) sound-src) (.play sound)))
-
-(defn expired? [stime etime]
-  (<= (- etime stime) 0))
-
-; START app-state
-(def app-state (atom (default-state)))
-; END app-state
-
-; START format-time
 (defn format-time
   "Format time as min:sec"
   [d]
@@ -56,150 +41,108 @@
         sec (.getSeconds d)
         formatted (map #(if (< % 10) (str "0" %) %) [min sec])]
     (string/join ":" formatted)))
-; END format-time
 
-; START display-time multi method
+;; Converts numbers to dates to be passed to `format-time`
 (defmulti display-time (fn [d] (type d)))
-(defmethod display-time js/Number [d] (format-time (js/Date. d)))
+(defmethod display-time js/Number [t] (format-time (->date t)))
 (defmethod display-time js/Date [d] (format-time d))
-; END display-time
 
-(defn preset-item [{:keys [on] :as cursor} owner]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/li
-        #js {:className (if (.valueOf on) "preset disabled" "preset")}
-        (dom/a #js {:onClick (fn [e]
-                               (.preventDefault e)
-                               (when-not (.valueOf on)
-                                 (let [t (om/get-state owner :time)
-                                       ds (default-state)]
-                                   (om/transact! cursor
-                                                 #(assoc (into % ds)
-                                                         :selected-time t
-                                                         :etime (+ (* one-min t) (:stime ds)))))))}
-               (om/get-state owner :time))))))
+(defn expired? [stime etime] (<= (- etime stime) 0))
+(defn sub-sec [t] (- t one-min))
 
-(defn presets-view [{:keys [stime etime on] :as cursor} _]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/div #js {:className "navbar-collapse"}
-               (dom/ul #js {:className "nav navbar-nav navbar-right"}
-                       (om/build preset-item cursor {:init-state {:time 1}})
-                       (om/build preset-item cursor {:init-state {:time 5}})
-                       (om/build preset-item cursor {:init-state {:time 25}}))))))
+(defn time-diff [start end] (- end start))
 
-(defn header-view [{:keys [stime etime on] :as cursor} _]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/nav #js {:className "navbar navbar-default"}
-               (dom/div #js {:className "navbar-header"}
-                        (dom/img #js {:className "navbar-left navbar-text"
-                                      :src "/images/pom-sm.png"
-                                      :alt "pomodoro"})
-                        (dom/a #js {:className "navbar-brand"
-                                    :href="http://pomodoro.trevorlandau.net"} "pOModoro"))
-               (om/build presets-view cursor)))))
+(defn can-update [rtime etime on?]
+  (and on? (> (time-diff rtime etime) 0)))
 
-(defn timer-view [{:keys [stime etime on]} owner]
-  (reify
-    om/IInitState
-    (init-state [_]
-      {:width "100%"})
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Sound
+(def ^:constant sound-src "/sounds/bell.mp3")
+(def sound (js/Audio. sound-src))
+(defn play-sound [] (do (set! (.-src sound) sound-src) (.play sound)))
 
-    om/IWillUpdate
-    (will-update [_ {:keys [stime etime orig-time]} _]
-      (om/set-state! owner :width (-> (/ (- etime stime) (- etime orig-time))
-                                      (* 100)
-                                      (str "%"))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; App Setup
 
-    om/IRenderState
-    (render-state [_ {:keys [width]}]
-      (dom/div
-        #js {:className (let [s  "progress"]
-                          (if (.valueOf on)
-                            (str s " progress-striped active")
-                            s))}
-        (dom/div
-          #js {:className "progress-bar progress-bar-danger"
-               :style #js {:width width}}
-          (display-time (- etime stime)))))))
+(defn time-map [time]
+  "Generates a map with start/end/running time keys"
+  (let [now (now)]
+    (hash-map :stime now
+              :etime (+ time now)
+              :rtime now)))
 
-(defn actions-view [{:keys [stime etime on] :as cursor} _]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/div
-        nil
-        (dom/div #js {:className "center-block btn-group"}
-                 (dom/button
-                   #js {:type "button"
-                        :className "btn btn-sm btn-default"
-                        :onClick (fn []
-                                   (om/transact! on #(not (.valueOf on))))}
-                   (if (.valueOf on) "Pause" "Resume"))
+(defn default-state
+  ([]
+   (default-state (:twenty-five presets)))
 
-                 (dom/button
-                   #js {:type "button"
-                        :className "btn btn-sm btn-default"
-                        :onClick #(when-not (.valueOf on)
-                                    (om/transact! cursor default-state))
-                        :disabled (.valueOf on)}
-                   "Reset"))
+  ([time]
+     (let [tmap (time-map time)]
+       (merge tmap {:today (get-in tmap [:stime])
+                    :on? false}))))
 
-        (dom/div #js {:className "pull-right info-bar"}
-                 (dom/a #js {:href "https://github.com/landau/cljs-pomodoro"
-                             :target "_blank"}
-                        (dom/i #js {:className "fa fa-github-square"} ""))
+(def state (atom (default-state)))
 
-                 (dom/a #js {:href "https://twitter.com/trevor_landau"
-                             :target "_blank"}
-                        (dom/i #js {:className "fa fa-twitter-square"} ""))
+(defn get-state [key]
+  (get-in @state [key]))
 
-                 (dom/a #js {:href "http://en.wikipedia.org/wiki/Pomodoro_Technique"
-                             :target "_blank"}
-                        (dom/i #js {:className "fa fa-question-circle"} "")))))))
+(defn set-state!
+  ([val-map]
+     (swap! state merge val-map))
 
-(defn can-update [{:keys [stime etime on]}]
-  (and (.valueOf on) (> (- etime stime) 0)))
+  ([key val]
+     (print key val)
+     (swap! state assoc key val)))
 
-; START pom-view
-(defn pom-view [{:keys [stime etime on] :as cursor} owner]
-  (reify
-    om/IDisplayName
-    (display-name [_] "pom-view")
+(defn set-time! [time]
+  (set-state! (time-map time)))
 
-    ;; Update timer and app state here
-    om/IWillMount
-    (will-mount [_]
-      (js/setInterval
-        (fn []
-          (om/transact! cursor #(if (can-update %)
-                               (assoc % :stime (+ 1e3 (:stime %)))
-                               %))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Generic Views
+(defn btn-lg
+  "Creates a large button"
+  ([body] (btn-lg {} body))
 
-          ;; Must run sound outside of requestAnimationFrame cycle, all for the sound to play
-          (when (and (complement om/rendering?)
-                     (expired? (@cursor :stime) (@cursor :etime)))
+  ([{:keys [on-click]} & body]
+     [:button {:class "btn btn-lg"
+               :on-click on-click} body]))
 
-            (om/transact! cursor
-                          #(let [selected (if (= (:selected-time %) (:twenty-five presets))
-                                            :five :twenty-five)]
-                             (default-state selected)))
-            (om/transact! on #(identity false))
-            (play-sound)))
-        1e3))
+(defn icon [name & body]
+  [:i {:class (str "fa fa-" name)} body])
 
-    om/IRender
-    (render [_]
-      (dom/div
-        #js {:className "timer-body"}
-        (om/build header-view cursor)
-        (om/build timer-view cursor)
-        (om/build actions-view cursor)))))
-; END pom-view
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Timer View
+(defn time-view []
+  [:div {:class "col-md-3 col-md-offset-4"}
+   [:h1 (display-time (apply time-diff
+                             (map get-state (list :rtime :etime))))]])
 
-(om/root pom-view app-state {:target (. js/document (getElementById "app"))})
+(defn controls-view []
+  (let [on25 #(when-not (get-state :on?) (set-time! (presets :twenty-five)))
+        on5 #(when-not (get-state :on?) (set-time! (presets :five)))
+        on-toggle #(set-state! :on? (not (get-state :on?)))
+        on-reset #(when-not (get-state :on?)
+                    (set-state! (default-state (get-state :stime))))]
+
+   [:div {:class "col-md-2 buttons"}
+    [btn-lg {:on-click on25} 25]
+    [btn-lg {:on-click on5} 5]
+    [:br]
+    ;; TODO togglify
+    [btn-lg {:on-click on-toggle} [icon "play"]]
+    [btn-lg {:on-click on-reset} [icon "refresh"]]]))
+
+(defn timer-view []
+  [:div {:class "row v-center"}
+   [time-view]
+   [controls-view]])
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Today view
+(defn today-view []
+  [:div {:class "col-md-12 text-center"}
+   [:h2 (get-state :today)]])
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Rendering
+(reagent/render-component [timer-view] (. js/document (getElementById "timer")))
+(reagent/render-component [today-view] (. js/document (getElementById "today")))
