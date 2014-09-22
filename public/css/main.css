@@ -71,3 +71,9 @@ h1, h2 {
 .buttons .btn:hover {
   color: #999;
 }
+
+.btn:focus {
+  outline: none;
+  border: none;
+  background: #555;
+}
