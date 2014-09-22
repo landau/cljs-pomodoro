@@ -2,7 +2,8 @@
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [reagent.core :as reagent :refer [atom]]
             [cljs.core.async :refer [put! <! chan]]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            [cljs-time.format :refer [date-formatters]]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Debugging
@@ -47,13 +48,19 @@
 (defmethod display-time js/Number [t] (format-time (->date t)))
 (defmethod display-time js/Date [d] (format-time d))
 
-(defn expired? [stime etime] (<= (- etime stime) 0))
-(defn sub-sec [t] (- t one-min))
-
 (defn time-diff [start end] (- end start))
 
-(defn can-update [rtime etime on?]
-  (and on? (> (time-diff rtime etime) 0)))
+(defn expired? [stime etime] (<= (time-diff stime etime) 0))
+
+(defn dec-time [t] (- t 1e3))
+
+(defmulti pretty-date (fn [d] (type d)))
+(defmethod pretty-date js/Number [t] (pretty-date (->date t)))
+(defmethod pretty-date js/Date [d]
+  (let [doy ((date-formatters "EEEE") d)
+        month ((date-formatters "MMMM") d)
+        day ((date-formatters "dd") d)]
+    (str doy ", " month " " day)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Sound
@@ -67,9 +74,9 @@
 (defn time-map [time]
   "Generates a map with start/end/running time keys"
   (let [now (now)]
-    (hash-map :stime now
-              :etime (+ time now)
-              :rtime now)))
+    {:time time
+     :stime now
+     :etime (+ time now)}))
 
 (defn default-state
   ([]
@@ -82,19 +89,43 @@
 
 (def state (atom (default-state)))
 
-(defn get-state [key]
-  (get-in @state [key]))
+(defn get-state
+  ([key & keys]
+     (map get-state (conj keys key)))
+  ([key]
+     (get-in @state [key])))
 
 (defn set-state!
   ([val-map]
      (swap! state merge val-map))
 
   ([key val]
-     (print key val)
      (swap! state assoc key val)))
 
 (defn set-time! [time]
   (set-state! (time-map time)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Timer logic
+(def ^:constant time-speed 1e3)
+
+(def timer-chan
+  (let [c (chan)
+        timer (js/setInterval
+               #(when (get-state :on?) (put! c true))
+               time-speed)]
+    c))
+
+(go (while true
+      (<! timer-chan)
+      (when-not (apply expired? (get-state :stime :etime))
+        (set-state! :etime (dec-time (get-state :etime))))))
+
+(add-watch state :end
+           (fn [k r os ns]
+             (when (and (get-state :on?) (apply expired? (get-state :stime :etime)))
+               (play-sound)
+               (set-state! :on? false))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Generic Views
@@ -102,7 +133,7 @@
   "Creates a large button"
   ([body] (btn-lg {} body))
 
-  ([{:keys [on-click]} & body]
+  ([{:keys [on-click disabled?]} & body]
      [:button {:class "btn btn-lg"
                :on-click on-click} body]))
 
@@ -114,7 +145,7 @@
 (defn time-view []
   [:div {:class "col-md-3 col-md-offset-4"}
    [:h1 (display-time (apply time-diff
-                             (map get-state (list :rtime :etime))))]])
+                             (map get-state (list :stime :etime))))]])
 
 (defn controls-view []
   (let [on25 #(when-not (get-state :on?) (set-time! (presets :twenty-five)))
@@ -128,7 +159,7 @@
     [btn-lg {:on-click on5} 5]
     [:br]
     ;; TODO togglify
-    [btn-lg {:on-click on-toggle} [icon "play"]]
+    [btn-lg {:on-click on-toggle} [icon (if (get-state :on?) "pause" "play")]]
     [btn-lg {:on-click on-reset} [icon "refresh"]]]))
 
 (defn timer-view []
@@ -140,7 +171,7 @@
 ;; Today view
 (defn today-view []
   [:div {:class "col-md-12 text-center"}
-   [:h2 (get-state :today)]])
+   [:h2 (pretty-date (get-state :today))]])
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Rendering
