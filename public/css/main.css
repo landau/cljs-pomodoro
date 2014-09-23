@@ -75,5 +75,5 @@ h1, h2 {
 .btn:focus {
   outline: none;
   border: none;
-  background: #555;
+  color: #555;
 }
