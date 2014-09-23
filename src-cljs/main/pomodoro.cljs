@@ -1,7 +1,7 @@
 (ns main.pomodoro
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [reagent.core :as reagent :refer [atom]]
-            [cljs.core.async :refer [put! <! chan]]
+            [cljs.core.async :refer [put! <! >! chan]]
             [clojure.string :as string]
             [cljs-time.format :refer [date-formatters]]))
 
@@ -68,6 +68,13 @@
 (def sound (js/Audio. sound-src))
 (defn play-sound [] (do (set! (.-src sound) sound-src) (.play sound)))
 
+(def ^:constant images ["bg2.jpg"
+                        "bg3.jpg"])
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; History
+(def history (atom []))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; App Setup
 
@@ -85,9 +92,12 @@
   ([time]
      (let [tmap (time-map time)]
        (merge tmap {:today (get-in tmap [:stime])
+                    :bg (first images)
                     :on? false}))))
 
 (def state (atom (default-state)))
+(def bg-chan (chan))
+(def end-chan (chan))
 
 (defn get-state
   ([key & keys]
@@ -109,9 +119,14 @@
   (if (= (:twenty-five presets) time)
     (:five presets)
     (:twenty-five presets)))
+
+(defn pomodoro? [five twenty-five]
+  (and (= (presets :twenty-five) twenty-five)
+       (= (presets :five) five)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Timer logic
-(def ^:constant time-speed 1e3)
+(def ^:constant time-speed 1)
 
 (def timer-chan
   (let [c (chan)
@@ -125,11 +140,29 @@
       (when-not (apply expired? (get-state :stime :etime))
         (set-state! :etime (dec-time (get-state :etime))))))
 
+
 (add-watch state :end
            (fn [k r os ns]
              (when (and (get-state :on?) (apply expired? (get-state :stime :etime)))
-               (play-sound)
-               (set-state! (default-state (next-time (get-state :time)))))))
+               (put! end-chan true))))
+
+(go (while true
+      (<! end-chan)
+      (>! bg-chan true)
+      (play-sound) ;; ding!
+      (set-state! (default-state (next-time (get-state :time)))))) ;; set next pomodoro session
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Background logic
+(defn set-bg! [bg]
+  (let [img (nth images (rand-int 2))]
+    (set-state! :bg img)))
+
+(go (while true
+      (<! bg-chan)
+      (swap! history conj (get-state :time))
+      (when (apply pomodoro? (take-last 2 @history))
+        (set-bg! (get-state :bg)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Generic Views
@@ -156,7 +189,7 @@
         on5 #(when-not (get-state :on?) (set-time! (presets :five)))
         on-toggle #(set-state! :on? (not (get-state :on?)))
         on-reset #(when-not (get-state :on?)
-                    (set-state! (default-state (get-state :stime))))]
+                    (set-state! (default-state (get-state :time))))]
 
    [:div {:class "col-md-2 buttons"}
     [btn-lg {:on-click on25} 25]
@@ -178,6 +211,14 @@
    [:h2 (pretty-date (get-state :today))]])
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Style View
+(defn bg->style [val] (str "background: url(/images/" val ") center center no-repeat; background-size: cover;"))
+
+(defn bg-view []
+  [:style (str "body {" (bg->style (get-state :bg)) "}")])
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Rendering
 (reagent/render-component [timer-view] (. js/document (getElementById "timer")))
 (reagent/render-component [today-view] (. js/document (getElementById "today")))
+(reagent/render-component [bg-view] (. js/document (getElementById "style")))
