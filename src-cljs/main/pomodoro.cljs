@@ -105,6 +105,10 @@
 (defn set-time! [time]
   (set-state! (time-map time)))
 
+(defn next-time [time]
+  (if (= (:twenty-five presets) time)
+    (:five presets)
+    (:twenty-five presets)))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Timer logic
 (def ^:constant time-speed 1e3)
@@ -125,7 +129,7 @@
            (fn [k r os ns]
              (when (and (get-state :on?) (apply expired? (get-state :stime :etime)))
                (play-sound)
-               (set-state! :on? false))))
+               (set-state! (default-state (next-time (get-state :time)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Generic Views
