@@ -13,10 +13,8 @@
 ;; Constants
 
 (def ^:constant one-min (* 1e3 60))
-(comment (def ^:constant presets {:five (* one-min 5)
-                                  :twenty-five (* one-min 25)}))
-(def ^:constant presets {:five 1e3
-                         :twenty-five (* 1e3 2)})
+(def ^:constant presets {:five (* one-min 5)
+                                 :twenty-five (* one-min 25)})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Compatability
@@ -205,7 +203,6 @@
     [btn-lg {:on-click on25} 25]
     [btn-lg {:on-click on5} 5]
     [:br]
-    ;; TODO togglify
     [btn-lg {:on-click on-toggle} [icon (if (get-state :on?) "pause" "play")]]
     [btn-lg {:on-click on-reset} [icon "refresh"]]]))
 
@@ -222,7 +219,8 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Style View
-(defn bg->style [val] (str "background: url(/images/" val ") center center no-repeat; background-size: cover;"))
+(defn bg->style [val]
+  (str "background: url(/images/bg/" val ") center center no-repeat; background-size: cover;"))
 
 (defn bg-view []
   [:style (str "body {" (bg->style (get-state :bg)) "}")])
