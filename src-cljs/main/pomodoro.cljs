@@ -13,8 +13,10 @@
 ;; Constants
 
 (def ^:constant one-min (* 1e3 60))
-(def ^:constant presets {:five (* one-min 5)
-                         :twenty-five (* one-min 25)})
+(comment (def ^:constant presets {:five (* one-min 5)
+                                  :twenty-five (* one-min 25)}))
+(def ^:constant presets {:five 1e3
+                         :twenty-five (* 1e3 2)})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Compatability
@@ -68,8 +70,8 @@
 (def sound (js/Audio. sound-src))
 (defn play-sound [] (do (set! (.-src sound) sound-src) (.play sound)))
 
-(def ^:constant images ["bg2.jpg"
-                        "bg3.jpg"])
+(def images (atom ["bg2.jpg"
+                    "bg3.jpg"]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; History
@@ -92,7 +94,7 @@
   ([time]
      (let [tmap (time-map time)]
        (merge tmap {:today (get-in tmap [:stime])
-                    :bg (first images)
+                    :bg (first @images)
                     :on? false}))))
 
 (def state (atom (default-state)))
@@ -120,13 +122,13 @@
     (:five presets)
     (:twenty-five presets)))
 
-(defn pomodoro? [five twenty-five]
-  (and (= (presets :twenty-five) twenty-five)
-       (= (presets :five) five)))
+(defn pomodoro? [twenty-five five]
+  (and (= (:twenty-five presets) twenty-five)
+       (= (:five presets) five)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Timer logic
-(def ^:constant time-speed 1)
+(def ^:constant time-speed 1e3)
 
 (def timer-chan
   (let [c (chan)
@@ -135,12 +137,13 @@
                time-speed)]
     c))
 
+;; Update timer 
 (go (while true
       (<! timer-chan)
       (when-not (apply expired? (get-state :stime :etime))
         (set-state! :etime (dec-time (get-state :etime))))))
 
-
+;; put! to end-chan when timer ends
 (add-watch state :end
            (fn [k r os ns]
              (when (and (get-state :on?) (apply expired? (get-state :stime :etime)))
@@ -150,18 +153,25 @@
       (<! end-chan)
       (>! bg-chan true)
       (play-sound) ;; ding!
+      (swap! history conj (get-state :time))
       (set-state! (default-state (next-time (get-state :time)))))) ;; set next pomodoro session
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Background logic
-(defn set-bg! [bg]
-  (let [img (nth images (rand-int 2))]
-    (set-state! :bg img)))
+(defn set-bg! [bg] (set-state! :bg (first @images)))
+
+(defn rotate [coll]
+  "Place initial value at end of seq"
+  (concat (rest coll) (take 1 coll)))
+
+(defn rotate-images [] (swap! images rotate))
 
 (go (while true
       (<! bg-chan)
-      (swap! history conj (get-state :time))
       (when (apply pomodoro? (take-last 2 @history))
+        (print @images)
+        (rotate-images)
+        (print @images)
         (set-bg! (get-state :bg)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
