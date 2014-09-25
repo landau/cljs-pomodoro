@@ -1,6 +1,6 @@
 (defproject pomodoro "0.0.4"
-  :license {:name "ISC"
-            :url "http://opensource.org/licenses/ISC"
+  :license {:name "MIT"
+            :url "http://opensource.org/licenses/MIT"
             :distribution :repo}
 
   :description "A simple pomodoro timer"
