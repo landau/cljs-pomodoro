@@ -45,8 +45,5 @@
                         :compiler {:output-to "public/js/main.js"
                                    :optimizations :advanced
                                    :pretty-print false
-                                   ;;:preamble ["public/js/react-0.9.0.min.js"
-                                   ;;           "public/js/moment.min.js"]
-                                   :externs ["public/js/react-0.11.2.js"
-                                             "public/js/moment.min.js"]
+                                   :externs ["public/js/react-min-0.11.2.js"]
                                    }}]})
