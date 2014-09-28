@@ -3,7 +3,6 @@ html, body {
   font-family: 'Lato', sans-serif;
   color: #fefefe;
   font-weight: 300;
-  background: url(/images/bg2.jpg) center center no-repeat;
   background-size: cover;
 }
 
@@ -38,10 +37,19 @@ h1, h2 {
   margin-top: 7%;
 }
 
+.lt-black {
+  background: rgba(0,0,0,0.30);
+}
+
+.bar {
+  padding: 30px inherit;
+}
+
 /* signature */
 .sig {
   text-align: center;
   font-size: 14px;
+  letter-spacing: 3px;
 }
 
 .btn-toolbar{
@@ -63,7 +71,7 @@ h1, h2 {
   margin-top: 20px;
 }
 
-.btn:hover {
+.btn:hover, a:hover {
   color: #3498db;
 }
 
@@ -75,4 +83,8 @@ h1, h2 {
   outline: none;
   border: none;
   color: #555;
+}
+
+.btn[disabled] {
+  opacity: 0.2;
 }

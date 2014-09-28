@@ -68,8 +68,7 @@
 (def sound (js/Audio. sound-src))
 (defn play-sound [] (do (set! (.-src sound) sound-src) (.play sound)))
 
-(def images (atom ["bg2.jpg"
-                    "bg3.jpg"]))
+(def images (atom (shuffle (map #(str "bg" % ".jpg") (range 1 12)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; History
@@ -92,7 +91,6 @@
   ([time]
      (let [tmap (time-map time)]
        (merge tmap {:today (get-in tmap [:stime])
-                    :bg (first @images)
                     :on? false}))))
 
 (def state (atom (default-state)))
@@ -124,6 +122,8 @@
   (and (= (:twenty-five presets) twenty-five)
        (= (:five presets) five)))
 
+(defn on? [] (get-state :on?))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Timer logic
 (def ^:constant time-speed 1e3)
@@ -131,7 +131,7 @@
 (def timer-chan
   (let [c (chan)
         timer (js/setInterval
-               #(when (get-state :on?) (put! c true))
+               #(when (on?) (put! c true))
                time-speed)]
     c))
 
@@ -144,7 +144,7 @@
 ;; put! to end-chan when timer ends
 (add-watch state :end
            (fn [k r os ns]
-             (when (and (get-state :on?) (apply expired? (get-state :stime :etime)))
+             (when (and (on?) (apply expired? (get-state :stime :etime)))
                (put! end-chan true))))
 
 (go (while true
@@ -156,8 +156,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Background logic
-(defn set-bg! [bg] (set-state! :bg (first @images)))
-
 (defn rotate [coll]
   "Place initial value at end of seq"
   (concat (rest coll) (take 1 coll)))
@@ -167,10 +165,7 @@
 (go (while true
       (<! bg-chan)
       (when (apply pomodoro? (take-last 2 @history))
-        (print @images)
-        (rotate-images)
-        (print @images)
-        (set-bg! (get-state :bg)))))
+        (rotate-images))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Generic Views
@@ -178,9 +173,11 @@
   "Creates a large button"
   ([body] (btn-lg {} body))
 
-  ([{:keys [on-click disabled?]} & body]
-     [:button {:class "btn btn-lg"
-               :on-click on-click} body]))
+  ([{:keys [disabled?] :as opts} & body]
+     [:button (merge {:class (str "btn btn-lg")
+                      :disabled disabled?}
+                     (select-keys opts [:on-click]))
+      body]))
 
 (defn icon [name & body]
   [:i {:class (str "fa fa-" name)} body])
@@ -193,21 +190,21 @@
                              (map get-state (list :stime :etime))))]])
 
 (defn controls-view []
-  (let [on25 #(when-not (get-state :on?) (set-time! (presets :twenty-five)))
-        on5 #(when-not (get-state :on?) (set-time! (presets :five)))
-        on-toggle #(set-state! :on? (not (get-state :on?)))
-        on-reset #(when-not (get-state :on?)
+  (let [on25 #(when-not (on?) (set-time! (presets :twenty-five)))
+        on5 #(when-not (on?) (set-time! (presets :five)))
+        on-toggle #(set-state! :on? (not (on?)))
+        on-reset #(when-not (on?)
                     (set-state! (default-state (get-state :time))))]
 
-   [:div {:class "col-md-2 buttons"}
-    [btn-lg {:on-click on25} 25]
-    [btn-lg {:on-click on5} 5]
-    [:br]
-    [btn-lg {:on-click on-toggle} [icon (if (get-state :on?) "pause" "play")]]
-    [btn-lg {:on-click on-reset} [icon "refresh"]]]))
+    [:div {:class "col-md-2 buttons"}
+     [btn-lg {:on-click on25 :disabled? (on?)} 25]
+     [btn-lg {:on-click on5 :disabled? (on?)} 5]
+     [:br]
+     [btn-lg {:on-click on-toggle} [icon (if (on?) "pause" "play")]]
+     [btn-lg {:on-click on-reset :disabled? (on?)} [icon "refresh"]]]))
 
 (defn timer-view []
-  [:div {:class "row v-center"}
+  [:div {:class "row"}
    [time-view]
    [controls-view]])
 
@@ -223,7 +220,7 @@
   (str "background: url(/images/bg/" val ") center center no-repeat; background-size: cover;"))
 
 (defn bg-view []
-  [:style (str "body {" (bg->style (get-state :bg)) "}")])
+  [:style (str "body {" (bg->style (first @images)) "}")])
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Rendering
